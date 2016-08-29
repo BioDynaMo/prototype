@@ -57,7 +57,7 @@ int main() {
   // std::cout << "Sum read from ROOT file = " << (*vec_r)[0]
   //           << std::endl;
 
-  std::cout << "[Read from ROOT file]: cell.GetFoo() =" << cell_r->GetFoo()
+  std::cout << "[Read from ROOT file]: cell.GetFoo() = " << cell_r->GetFoo()
             << std::endl;
   return 0;
 }
