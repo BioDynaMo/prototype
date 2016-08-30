@@ -1,5 +1,5 @@
-#ifndef __NEURITE_H__
-#define __NEURITE_H__
+#ifndef NEURITE_H_
+#define NEURITE_H_
 
 #include <Rtypes.h>
 
@@ -15,4 +15,4 @@ class Neurite {
   ClassDef(Neurite, 1);
 };
 
-#endif
+#endif  // NEURITE_H_

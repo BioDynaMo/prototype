@@ -1,5 +1,5 @@
-#ifndef __BASE_CELL_H
-#define __BASE_CELL_H
+#ifndef BASE_CELL_H_
+#define BASE_CELL_H_
 
 #include <array>
 #include <iostream>
@@ -28,4 +28,4 @@ void coreOp(Cell* cell) {
   std::cout << cell->GetPosition()[2] << std::endl;
 }
 
-#endif
+#endif  // BASE_CELL_H_

@@ -6,7 +6,6 @@
 #include "neuron_extension.h"
 
 #include <TFile.h>
-#include <TVectorD.h>
 
 long timestamp();
 
@@ -34,12 +33,9 @@ int main() {
   for (int i = 0; i < 10e6 + 1; i++) {
     sum += cell.GetFoo();
 
-    // serialize sum every 100000th iteration
+    // serialize cell every 100000th iteration
     if (i % 100000 == 0) {
       TFile *f = new TFile("flexibility.root", "RECREATE");
-      // TVectorD vec_w(1);
-      // vec_w(0) = sum;
-      // f->WriteObject(&vec_w, "sum");
       f->WriteObject(&cell, "cell");
       f->Close();
     }
@@ -47,15 +43,11 @@ int main() {
   std::cout << "Sum " << sum << " - in " << (timestamp() - start) << "ms"
             << std::endl;
 
-  // read sum from root file
+  // read cell from root file
   TFile *g = TFile::Open("flexibility.root");
-  // TVectorD *vec_r = (TVectorD*)g->Get("sum");
   CustomNeuron *cell_r;
   g->GetObject("cell", cell_r);
   g->Close();
-
-  // std::cout << "Sum read from ROOT file = " << (*vec_r)[0]
-  //           << std::endl;
 
   std::cout << "[Read from ROOT file]: cell.GetFoo() = " << cell_r->GetFoo()
             << std::endl;

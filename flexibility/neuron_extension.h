@@ -1,5 +1,5 @@
-#ifndef __NEURON_EXTENSION_H__
-#define __NEURON_EXTENSION_H__
+#ifndef NEURON_EXTENSION_H_
+#define NEURON_EXTENSION_H_
 
 #include <iostream>
 #include <Rtypes.h>
@@ -17,7 +17,6 @@ class NeuronExtension : public Base {
   NeuronExtension() = default;
   double GetFoo() const { return foo_; }
 
- private:
   ClassDefNV(NeuronExtension, 1);
 };
 
@@ -29,4 +28,4 @@ void customOp(const Cell& cell) {
   std::cout << cell->GetFoo() << std::endl;
 }
 
-#endif
+#endif  // NEURON_EXTENSION_H_
