@@ -8,5 +8,6 @@
 #pragma link C++ nestedtypedef;
 
 #pragma link C++ class Neurite+;
+#pragma link C++ class Neuron<BaseCell>+;
 
 #endif
