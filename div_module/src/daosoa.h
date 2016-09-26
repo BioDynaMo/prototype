@@ -17,6 +17,11 @@ class daosoa {
   using const_iterator = typename std::vector<value_type>::const_iterator;
 
   daosoa() {}
+  daosoa(size_t scalar_elements) : data_(scalar_elements / Backend::kVecLen + (scalar_elements % Backend::kVecLen ? 1 : 0)) {
+    for ( auto& value : data_ ) {
+      value.SetInitialized(false);
+    }
+  }
 
   explicit daosoa(const value_type& cell) {
     data_.push_back(cell);
@@ -30,6 +35,8 @@ class daosoa {
   /// \brief returns the number of SOA elements in this container
   size_t vectors() const { return data_.size(); }
 
+  /// this function assumes that only the last vector may not be fully
+  /// initialized
   size_t elements() const {
     if(vectors() != 0) {
       return (vectors() - 1) * Backend::kVecLen + data_[vectors() - 1].Size(); // fixme Size vectors
@@ -50,7 +57,7 @@ class daosoa {
   }
 
   // todo improve this comment
-  /// \brief adds `value` to the vector
+  /// \brief adds `scalar value` to the vector
   /// only gets compiled if T != T1 && T1 == ScalarBackend
   template <typename T1>
   typename std::enable_if<is_scalar<T1>::value &&
@@ -61,24 +68,26 @@ class daosoa {
                   "push_back of a non scalar type on a scalar type is not supported");
     if (data_.size() == 0) {
       value_type v;
-      v.SetSize(0);
+      v.SetInitialized(false);
       data_.push_back(v);
     }
     auto last = &data_[data_.size() - 1];
     if (last->is_full()) {
       value_type v1;
-      v1.SetSize(0);
+      v1.SetInitialized(false);
       data_.push_back(v1);
       last = &data_[data_.size() - 1];
     }
     last->Append(value);
   }
 
-  //fixme check if return or parameter return is more performant
   void Gather(const std::vector<int> indexes, daosoa<T, Backend>* ret) const {
+    assert(ret->data_.size() * Backend::kVecLen >= indexes.size());
+    size_t counter = 0;
     for (int idx : indexes) {
       const auto& scalar_element = GetScalar(idx);
-      ret->push_back(scalar_element);
+//      ret->push_back(scalar_element);
+      ret->SetScalar(counter++, scalar_element);
     }
   }
 
@@ -88,6 +97,13 @@ class daosoa {
     size_t vector_idx = index / Backend::kVecLen;
     size_t vec_el_idx = index % Backend::kVecLen;
     return data_[vector_idx].Get(vec_el_idx);
+  }
+
+  void SetScalar(size_t index, const T<ScalarBackend>& value) {
+    // fixme if this is ScalarBackend
+    size_t vector_idx = index / Backend::kVecLen;
+    size_t vec_el_idx = index % Backend::kVecLen;
+    return data_[vector_idx].Set(vec_el_idx, value);
   }
 
   value_type& operator[](std::size_t index) { return data_[index]; }

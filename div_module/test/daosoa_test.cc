@@ -15,8 +15,8 @@ class Object {
   template <typename T>
   friend class Object;
 
-  Object() {}
-  explicit Object(real_v id) : id_ {id} {}
+  Object() { SetInitialized(true); }
+  explicit Object(real_v id) : id_ {id} { SetInitialized(true); }
 
   const real_v& GetId() { return id_; }
 
@@ -30,23 +30,32 @@ class Object {
   }
 
   void Set(size_t idx, const Object<ScalarBackend>& object) {
+    initialized_[idx] = true;
     id_[idx] = object.id_[0];
   }
 
   void Append(const Object<ScalarBackend>& object) {
-    Set(size_++, object);
+    Set(Size(), object);
   }
 
-  bool is_full() const { return size_ == Backend::kVecLen; }
+  bool is_full() const { return Size() == Backend::kVecLen; }
 
   constexpr size_t VecLength() { return Backend::kVecLen; }
 
-  size_t Size() const { return size_; }
+  size_t Size() const {
+    size_t counter = 0;
+    for (auto el : initialized_) {
+      if (el) counter++;
+    }
+    return counter;
+  }
 
-  void SetSize(size_t size) { size_ = size; }
+  void SetInitialized(bool value) {
+    for ( auto& el : initialized_) el = value;
+  }
 
  private:
-  size_t size_ = Backend::kVecLen;
+  std::array<bool, Backend::kVecLen> initialized_;
 
   real_v id_;
 };
@@ -83,6 +92,24 @@ TEST (daosoaTest, PushBackAndGetScalars) {
   }
 }
 
+TEST (daosoaTest, ReserveElementsSetScalar) {
+  const size_t elements = VcBackend::kVecLen * 2 + 2;
+  daosoa<Object> objects(elements);
+
+  // create objects
+  for (size_t i = 0; i < elements; i++) {
+    objects.SetScalar(i, Object<ScalarBackend>(i));
+  }
+
+  EXPECT_EQ(elements, objects.elements());
+  EXPECT_EQ(size_t(3), objects.vectors());
+
+  // check if it returns the correct objects
+  for (size_t i = 0; i < elements; i++) {
+    EXPECT_EQ(i, objects.GetScalar(i).GetId()[0]);
+  }
+}
+
 TEST (daosoaTest, Gather) {
   daosoa<Object> objects;
 
@@ -91,7 +118,7 @@ TEST (daosoaTest, Gather) {
     objects.push_back(Object<ScalarBackend>(i));
   }
   
-  daosoa<Object> gathered;
+  daosoa<Object> gathered(4);
   std::vector<int> indexes = {5, 3, 9, 2};
   objects.Gather(indexes, &gathered);
 

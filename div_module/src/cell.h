@@ -14,7 +14,6 @@ namespace bdm {
 template <typename Backend>
 class Cell {
  public:
-  //  using typename Backend::kVecLen;
   using real_v = typename Backend::real_v;
   using real_t = typename Backend::real_t;
   using bool_v = typename Backend::bool_v;
@@ -22,26 +21,33 @@ class Cell {
   template <typename T>
   friend class Cell;
 
-  Cell() {}
-//  Cell(const Cell<Backend>& other) :position_{other.position_} {
-//  }
+  Cell() { SetInitialized(true); }
   Cell(real_v diameter) : diameter_{diameter} {
+    SetInitialized(true);
     UpdateVolume();
   }
-  Cell(const std::array<real_v, 3>& position) : position_{position}, mass_location_{position} {}
+  Cell(const std::array<real_v, 3>& position) : position_(position), mass_location_(position) {
+    SetInitialized(true);
+  }
 
   virtual ~Cell() {}
 
   // code related to SOA
   Vc_ALWAYS_INLINE void Append(const Cell<ScalarBackend>& cell);
 
-  Vc_ALWAYS_INLINE bool is_full() const { return size_ == Backend::kVecLen; }
+  Vc_ALWAYS_INLINE bool is_full() const { return Size() == Backend::kVecLen; }
 
-  Vc_ALWAYS_INLINE constexpr size_t VecLength() { return Backend::kVecLen; }
+  Vc_ALWAYS_INLINE size_t Size() const {
+    size_t counter = 0;
+    for (auto el : initialized_) {
+      if (el) counter++;
+    }
+    return counter;
+  }
 
-  Vc_ALWAYS_INLINE size_t Size() const { return size_; }
-
-  Vc_ALWAYS_INLINE void SetSize(size_t size) { size_ = size; }
+  Vc_ALWAYS_INLINE void SetInitialized(bool value) {
+    for ( auto& el : initialized_) el = value;
+  }
 
   Vc_ALWAYS_INLINE void Set(std::size_t index, const Cell<ScalarBackend>& cell);
 
@@ -56,12 +62,11 @@ class Cell {
 
   Vc_ALWAYS_INLINE const std::array<real_v, 3>& GetMassLocation () const { return mass_location_; }
 
-  // fixme return or return as parameter
   Vc_ALWAYS_INLINE std::array<daosoa<Cell, Backend >, Backend::kVecLen>
   GetNeighbors(const daosoa<Cell, Backend >& all_cells) const {
     std::array<daosoa<Cell, Backend>, Backend::kVecLen> ret;
     for (size_t i = 0; i < Backend::kVecLen; i++) {
-      daosoa<Cell, Backend> neighbors;
+      daosoa<Cell, Backend> neighbors(neighbors_[i].size());
       all_cells.Gather(neighbors_[i], &neighbors);
       ret[i] = neighbors;
     }
@@ -151,7 +156,8 @@ class Cell {
   //  }
 
  private:
-  std::size_t size_ = 0;
+  std::array<bool, Backend::kVecLen> initialized_;
+
   std::array<real_v, 3> position_;
   std::array<real_v, 3> mass_location_;
   real_v diameter_;
@@ -170,7 +176,7 @@ class Cell {
 
 template <typename Backend>
 void Cell<Backend>::Append(const Cell<ScalarBackend>& cell) {
-  Set(size_++, cell);
+  Set(Size(), cell);
 }
 
 //template <typename Backend>
@@ -225,6 +231,8 @@ void Cell<Backend>::Set(std::size_t index, const Cell<ScalarBackend>& cell) {
 template <>
 inline void Cell<VcBackend>::Set(std::size_t index,
                                  const Cell<ScalarBackend>& cell) {
+  initialized_[index] = true;
+
   // todo error if index out of bounds
   position_[0][index] = cell.position_[0][0];
   position_[1][index] = cell.position_[1][0];

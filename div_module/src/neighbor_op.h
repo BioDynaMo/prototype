@@ -64,6 +64,7 @@ struct NanoFlannDaosoaAdapter {
 class NeighborOp {
  public:
   NeighborOp() {}
+  NeighborOp(double distance) : distance_(distance) {}
   ~NeighborOp() {}
   NeighborOp(const NeighborOp&) = delete;
   NeighborOp& operator=(const NeighborOp&) = delete;
@@ -96,7 +97,7 @@ class NeighborOp {
       // fixme make param
       // according to roman 50 - 100 micron
       const VcBackend::real_t search_radius =
-          static_cast<VcBackend::real_t>(3000);
+          static_cast<VcBackend::real_t>(distance_);
 
       std::vector<std::pair<size_t, VcBackend::real_t> > ret_matches;
 
@@ -130,6 +131,9 @@ class NeighborOp {
       (*cells)[i].SetNeighbors(neighbors[i]);
     }
   }
+
+ private:
+  double distance_ = 3000;
 };
 
 }  // namespace bdm

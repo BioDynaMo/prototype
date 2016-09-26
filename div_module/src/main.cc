@@ -21,24 +21,23 @@ int main() {
 
   ///  auto c = CellFactory::getCellInstance( { 0.0, 0.0, 0.0 });
   ///  c->addCellModule(CellModule::UPtr { new DividingModule() });
+  const unsigned space = 20;
+  const unsigned n_elements_pe_dim = 128;
+  daosoa<Cell> cells(n_elements_pe_dim * n_elements_pe_dim * n_elements_pe_dim);
 
-  daosoa<Cell> cells;
-
-  // create a single cell and add it to the resource manager
   {
     Timing timing("setup");
-    const unsigned space = 20;
-    const unsigned n_elements_pe_dim = 128;
+    int counter = 0;
     for (size_t i = 0; i < n_elements_pe_dim; i++) {
       for (size_t j = 0; j < n_elements_pe_dim; j++) {
         for (size_t k = 0; k < n_elements_pe_dim; k++) {
           // todo that's ugly
           Cell<ScalarBackend> cell(std::array<ScalarBackend::real_v, 3> { i * space, j * space, k * space });
-          cell.SetDiameter(10);
+          cell.SetDiameter(30);
           cell.SetAdherence(0.4);
           cell.SetMass(1.0);
           cell.UpdateVolume();
-          cells.push_back(cell);
+          cells.SetScalar(counter++, cell);
         }
       }
     }
@@ -46,7 +45,7 @@ int main() {
 
   {
     Timing timing("neighbor_op");
-    bdm::NeighborOp op;
+    bdm::NeighborOp op(700);
     op.Compute(&cells);
   }
 
