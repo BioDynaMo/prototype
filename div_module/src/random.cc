@@ -5,10 +5,6 @@
 
 namespace bdm {
 
-double Random::next_next_gaussian_ = 0.0;
-bool Random::have_next_next_gaussian_ = false;
-long Random::seed_ = 0;
-
 void Random::setSeed(long seed) {
   seed_ = (seed ^ 25214903917L) & 281474976710655L;
   next_next_gaussian_ = 0.0;
@@ -65,25 +61,5 @@ double Random::nextGaussian() {
     return v1 * multiplier;
   }
 }
-
-std::array<double, 3> Random::nextNoise(double k) {
-  std::array<double, 3> ret;
-  ret[0] = -k + 2 * k * nextDouble();
-  ret[1] = -k + 2 * k * nextDouble();
-  ret[2] = -k + 2 * k * nextDouble();
-  return ret;
-}
-
-//template < typename Backend>
-//std::array<typename Backend::real_v, 3> Random::nextNoise(double k) {
-//  std::array<typename Backend::real_v, 3> ret;
-//  for ( size_t i = 0; i < Backend::real_v::Size; i++ ) {
-//    // todo not most cache friendly way
-//    ret[0][i] = -k + 2 * k * nextDouble();
-//    ret[1][i] = -k + 2 * k * nextDouble();
-//    ret[2][i] = -k + 2 * k * nextDouble();
-//  }
-//  return ret;
-//}
 
 }  // namespace bdm

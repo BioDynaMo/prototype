@@ -56,7 +56,7 @@ class DefaultForce {
     // location
     // fixme performance - generates a lot of random numbers which I think are hardly
     // ever used P(distance_between_centers < 0.00000001) very small
-    auto random_force = Random::NextNoise<VcBackend>(VcBackend::real_v(3.0));
+    auto random_force = random_.NextNoise<VcBackend>(VcBackend::real_v(3.0));
     auto distance_lt_min = distance_between_centers < real_v(0.00000001);   // fixme should be param or constant
     if (distance_lt_min.isFull()) {
       *result = random_force;
@@ -87,6 +87,9 @@ class DefaultForce {
 
     *result = ret;
   }
+
+ private:
+  Random random_;
 };
 
 }  // namespace bdm

@@ -11,20 +11,20 @@ namespace bdm {
  */
 class Random {
  public:
-  Random() = delete;
+  Random() {};
 
-  static void setSeed(long seed);
+  void setSeed(long seed);
 
-  static int nextInt();
+  int nextInt();
 
-  static double nextDouble();
+  double nextDouble();
 
-  static double nextGaussian(double mean, double standard_deviation);
+  double nextGaussian(double mean, double standard_deviation);
 
-  static std::array<double, 3> nextNoise(double k);
+  std::array<double, 3> nextNoise(double k);
 
   template <typename Backend>
-  static std::array<typename Backend::real_v, 3> NextNoise(const typename Backend::real_v& k) {
+  std::array<typename Backend::real_v, 3> NextNoise(const typename Backend::real_v& k) {
     std::array<typename Backend::real_v, 3> ret;
     for ( size_t i = 0; i < Backend::kVecLen; i++ ) {
       // todo not most cache friendly way
@@ -36,15 +36,15 @@ class Random {
   }
 
  private:
-  static long seed_;
-  static double next_next_gaussian_;
-  static bool have_next_next_gaussian_;
+  long seed_ = 0;
+  double next_next_gaussian_ = 0.0;
+  bool have_next_next_gaussian_ = false;
 
-  static int next(int i);
+  int next(int i);
 
-  static double nextGaussian();
+  double nextGaussian();
 
-  static bool compareAndSet(long& current, long expected, long update);
+  bool compareAndSet(long& current, long expected, long update);
 };
 
 }  // namespace bdm
