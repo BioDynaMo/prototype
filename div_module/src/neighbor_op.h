@@ -127,6 +127,7 @@ class NeighborOp {
     }
 
     // update neighbors
+#pragma omp parallel for
     for (size_t i = 0; i < cells->vectors(); i++) {
       (*cells)[i].SetNeighbors(neighbors[i]);
     }
