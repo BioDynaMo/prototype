@@ -21,32 +21,25 @@ class Cell {
   template <typename T>
   friend class Cell;
 
-  Cell() { SetInitialized(true); }
+  Cell() { }
   Cell(real_v diameter) : diameter_{diameter} {
-    SetInitialized(true);
     UpdateVolume();
   }
-  Cell(const std::array<real_v, 3>& position) : position_(position), mass_location_(position) {
-    SetInitialized(true);
-  }
+  Cell(const std::array<real_v, 3>& position) : position_(position), mass_location_(position) {}
 
   virtual ~Cell() {}
 
   // code related to SOA
   Vc_ALWAYS_INLINE void Append(const Cell<ScalarBackend>& cell);
 
-  Vc_ALWAYS_INLINE bool is_full() const { return Size() == Backend::kVecLen; }
+  Vc_ALWAYS_INLINE bool is_full() const { return size_ == Backend::kVecLen; }
 
   Vc_ALWAYS_INLINE size_t Size() const {
-    size_t counter = 0;
-    for (auto el : initialized_) {
-      if (el) counter++;
-    }
-    return counter;
+    return size_;
   }
 
-  Vc_ALWAYS_INLINE void SetInitialized(bool value) {
-    for ( auto& el : initialized_) el = value;
+  Vc_ALWAYS_INLINE void SetUninitialized() {
+    size_ = 0;
   }
 
   Vc_ALWAYS_INLINE void Set(std::size_t index, const Cell<ScalarBackend>& cell);
@@ -156,7 +149,7 @@ class Cell {
   //  }
 
  private:
-  std::array<bool, Backend::kVecLen> initialized_;
+  std::size_t size_ = Backend::kVecLen;
 
   std::array<real_v, 3> position_;
   std::array<real_v, 3> mass_location_;
@@ -176,7 +169,7 @@ class Cell {
 
 template <typename Backend>
 void Cell<Backend>::Append(const Cell<ScalarBackend>& cell) {
-  Set(Size(), cell);
+  Set(size_++, cell);
 }
 
 //template <typename Backend>
@@ -231,8 +224,6 @@ void Cell<Backend>::Set(std::size_t index, const Cell<ScalarBackend>& cell) {
 template <>
 inline void Cell<VcBackend>::Set(std::size_t index,
                                  const Cell<ScalarBackend>& cell) {
-  initialized_[index] = true;
-
   // todo error if index out of bounds
   position_[0][index] = cell.position_[0][0];
   position_[1][index] = cell.position_[1][0];

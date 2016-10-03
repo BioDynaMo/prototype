@@ -34,7 +34,6 @@ void execute(TimingAggregator* statistic) {
 
   {
     Timing timing("setup", statistic);
-    int counter = 0;
     for (size_t i = 0; i < n_elements_pe_dim; i++) {
       for (size_t j = 0; j < n_elements_pe_dim; j++) {
         for (size_t k = 0; k < n_elements_pe_dim; k++) {
@@ -44,7 +43,7 @@ void execute(TimingAggregator* statistic) {
           cell.SetAdherence(0.4);
           cell.SetMass(1.0);
           cell.UpdateVolume();
-          cells.SetScalar(counter++, cell);
+          cells.push_back(cell);
         }
       }
     }

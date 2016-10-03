@@ -17,10 +17,8 @@ class daosoa {
   using const_iterator = typename std::vector<value_type>::const_iterator;
 
   daosoa() {}
-  daosoa(size_t scalar_elements) : data_(scalar_elements / Backend::kVecLen + (scalar_elements % Backend::kVecLen ? 1 : 0)) {
-    for ( auto& value : data_ ) {
-      value.SetInitialized(false);
-    }
+  daosoa(size_t scalar_elements) {
+    data_.reserve(scalar_elements / Backend::kVecLen + (scalar_elements % Backend::kVecLen ? 1 : 0));
   }
 
   explicit daosoa(const value_type& cell) {
@@ -68,13 +66,13 @@ class daosoa {
                   "push_back of a non scalar type on a scalar type is not supported");
     if (data_.size() == 0) {
       value_type v;
-      v.SetInitialized(false);
+      v.SetUninitialized();
       data_.push_back(v);
     }
     auto last = &data_[data_.size() - 1];
     if (last->is_full()) {
       value_type v1;
-      v1.SetInitialized(false);
+      v1.SetUninitialized();
       data_.push_back(v1);
       last = &data_[data_.size() - 1];
     }
@@ -82,12 +80,9 @@ class daosoa {
   }
 
   void Gather(const std::vector<int> indexes, daosoa<T, Backend>* ret) const {
-    assert(ret->data_.size() * Backend::kVecLen >= indexes.size());
-    size_t counter = 0;
     for (int idx : indexes) {
       const auto& scalar_element = GetScalar(idx);
-//      ret->push_back(scalar_element);
-      ret->SetScalar(counter++, scalar_element);
+      ret->push_back(scalar_element);
     }
   }
 

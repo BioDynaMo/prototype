@@ -15,8 +15,8 @@ class Object {
   template <typename T>
   friend class Object;
 
-  Object() { SetInitialized(true); }
-  explicit Object(real_v id) : id_ {id} { SetInitialized(true); }
+  Object() { }
+  explicit Object(real_v id) : id_ {id} { }
 
   const real_v& GetId() { return id_; }
 
@@ -30,12 +30,11 @@ class Object {
   }
 
   void Set(size_t idx, const Object<ScalarBackend>& object) {
-    initialized_[idx] = true;
     id_[idx] = object.id_[0];
   }
 
   void Append(const Object<ScalarBackend>& object) {
-    Set(Size(), object);
+    Set(size_++, object);
   }
 
   bool is_full() const { return Size() == Backend::kVecLen; }
@@ -43,20 +42,15 @@ class Object {
   constexpr size_t VecLength() { return Backend::kVecLen; }
 
   size_t Size() const {
-    size_t counter = 0;
-    for (auto el : initialized_) {
-      if (el) counter++;
-    }
-    return counter;
+    return size_;
   }
 
-  void SetInitialized(bool value) {
-    for ( auto& el : initialized_) el = value;
+  void SetUninitialized() {
+    size_ = 0;
   }
 
  private:
-  std::array<bool, Backend::kVecLen> initialized_;
-
+  size_t size_ = Backend::kVecLen;
   real_v id_;
 };
 
@@ -98,7 +92,7 @@ TEST (daosoaTest, ReserveElementsSetScalar) {
 
   // create objects
   for (size_t i = 0; i < elements; i++) {
-    objects.SetScalar(i, Object<ScalarBackend>(i));
+    objects.push_back(Object<ScalarBackend>(i));
   }
 
   EXPECT_EQ(elements, objects.elements());
