@@ -49,6 +49,15 @@ class Object {
     size_ = 0;
   }
 
+  void SetSize(std::size_t size) {
+    size_ = size;
+  }
+
+  void CopyTo(std::size_t from_idx, std::size_t to_idx,
+              Object<VcBackend>* dest) const {
+    dest->id_[to_idx] = id_[from_idx];
+  }
+
  private:
   size_t size_ = Backend::kVecLen;
   real_v id_;

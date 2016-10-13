@@ -42,9 +42,16 @@ class Cell {
     size_ = 0;
   }
 
+  Vc_ALWAYS_INLINE void SetSize(std::size_t size) {
+    size_ = size;
+  }
+
   Vc_ALWAYS_INLINE void Set(std::size_t index, const Cell<ScalarBackend>& cell);
 
   Vc_ALWAYS_INLINE Cell<ScalarBackend> Get(std::size_t index) const;
+
+  Vc_ALWAYS_INLINE void CopyTo(std::size_t from_idx, std::size_t to_idx,
+                                Cell<VcBackend>* dest) const;
 
   // remaining functions
   Vc_ALWAYS_INLINE const real_v& GetAdherence() const { return adherence_; }
@@ -58,10 +65,11 @@ class Cell {
   Vc_ALWAYS_INLINE std::array<daosoa<Cell, Backend >, Backend::kVecLen>
   GetNeighbors(const daosoa<Cell, Backend >& all_cells) const {
     std::array<daosoa<Cell, Backend>, Backend::kVecLen> ret;
-    for (size_t i = 0; i < Backend::kVecLen; i++) {
-      daosoa<Cell, Backend> neighbors(neighbors_[i].size());
+    const size_t size = size_;
+    for (size_t i = 0; i < size; i++) {
+      daosoa<Cell, Backend> neighbors;
       all_cells.Gather(neighbors_[i], &neighbors);
-      ret[i] = neighbors;
+      ret[i] = std::move(neighbors);
     }
     return ret;
   }
@@ -238,6 +246,25 @@ inline void Cell<VcBackend>::Set(std::size_t index,
   tractor_force_[2][index] = cell.tractor_force_[2][0];
   adherence_[index] = cell.adherence_[0];
   mass_[index] = cell.mass_[0];
+}
+
+//todo only for vector backend
+template <typename Backend>
+inline void Cell<Backend>::CopyTo(std::size_t src_idx, std::size_t dest_idx,
+                             Cell<VcBackend>* dest) const {
+  dest->position_[0][dest_idx] = position_[0][src_idx];
+  dest->position_[1][dest_idx] = position_[1][src_idx];
+  dest->position_[2][dest_idx] = position_[2][src_idx];
+  dest->mass_location_[0][dest_idx] = mass_location_[0][src_idx];
+  dest->mass_location_[1][dest_idx] = mass_location_[1][src_idx];
+  dest->mass_location_[2][dest_idx] = mass_location_[2][src_idx];
+  dest->diameter_[dest_idx] = diameter_[src_idx];
+  dest->volume_[dest_idx] = volume_[src_idx];
+  dest->tractor_force_[0][dest_idx] = tractor_force_[0][src_idx];
+  dest->tractor_force_[1][dest_idx] = tractor_force_[1][src_idx];
+  dest->tractor_force_[2][dest_idx] = tractor_force_[2][src_idx];
+  dest->adherence_[dest_idx] = adherence_[src_idx];
+  dest->mass_[dest_idx] = mass_[src_idx];
 }
 
 }  // namespace bdm

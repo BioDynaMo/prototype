@@ -11,7 +11,7 @@
 #include "timing_aggregator.h"
 #include "displacement_op.h" //fixme remove
 #include "dividing_cell_op.h" //fixme remove
-#include "vtune_op_wrapper.h" //fixme remove
+//#include "vtune_op_wrapper.h" //fixme remove
 #include "ittnotify.h"
 
 using bdm::Cell;
@@ -24,7 +24,7 @@ using bdm::TimingAggregator;
 
 void execute(TimingAggregator* statistic) {
   const unsigned space = 20;
-  const unsigned n_elements_pe_dim = 256;
+  const unsigned n_elements_pe_dim = 128;
 
   Timing timing;
   auto start = timing.timestamp();
@@ -51,21 +51,26 @@ void execute(TimingAggregator* statistic) {
 
   {
     Timing timing("neighbor_op", statistic);
-    bdm::VTuneOpWrapper<bdm::NeighborOp> op(700);
+//    bdm::VTuneOpWrapper<bdm::NeighborOp> op(700);
+    bdm::NeighborOp op(700);
     op.Compute(&cells);
+  }
+
+//  __itt_resume();
+
+  {
+    Timing timing("div_op", statistic);
+//    bdm::VTuneOpWrapper<bdm::DividingCellOp> biology;
+    bdm::DividingCellOp biology;
+    biology.Compute(&cells);
   }
 
   __itt_resume();
 
   {
-    Timing timing("div_op", statistic);
-    bdm::VTuneOpWrapper<bdm::DividingCellOp> biology;
-    biology.Compute(&cells);
-  }
-
-  {
     Timing timing("displacement op", statistic);
-    bdm::VTuneOpWrapper<bdm::DisplacementOp> op;
+//    bdm::VTuneOpWrapper<bdm::DisplacementOp> op;
+    bdm::DisplacementOp op;
     op.Compute(&cells);
   }
 }
@@ -87,7 +92,7 @@ int main(int args, char** argv) {
       execute(&statistic);
     }
   } else {
-//    omp_set_num_threads(2);
+    omp_set_num_threads(1);
     execute(&statistic);
   }
   std::cout << statistic << std::endl;

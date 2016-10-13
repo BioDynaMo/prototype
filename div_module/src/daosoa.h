@@ -49,7 +49,7 @@ class daosoa {
   template <typename T1>
   typename std::enable_if<std::is_same<value_type, T1>::value>::type push_back(
       const T1& value) {
-    data_.push_back(value);
+    data_.push_back(std::move(value));
     // fixme broken: what if i first push_back a scalar element and then
     // a vector one??
   }
@@ -67,22 +67,55 @@ class daosoa {
     if (data_.size() == 0) {
       value_type v;
       v.SetUninitialized();
-      data_.push_back(v);
+      data_.emplace_back(std::move(v));
     }
     auto last = &data_[data_.size() - 1];
     if (last->is_full()) {
       value_type v1;
       v1.SetUninitialized();
-      data_.push_back(v1);
+      data_.emplace_back(std::move(v1));
       last = &data_[data_.size() - 1];
     }
     last->Append(value);
   }
 
-  void Gather(const std::vector<int> indexes, daosoa<T, Backend>* ret) const {
-    for (int idx : indexes) {
-      const auto& scalar_element = GetScalar(idx);
-      ret->push_back(scalar_element);
+  void Gather(const std::vector<int>& indexes, daosoa<T, Backend>* ret) const {
+//    for (int idx : indexes) {
+//      const auto& scalar_element = GetScalar(idx);
+//      ret->push_back(scalar_element);
+//    }
+    size_t scalars = indexes.size();
+    std::size_t n_vectors = scalars / Backend::kVecLen + (scalars % Backend::kVecLen ? 1 : 0);
+    std::size_t remaining = scalars % Backend::kVecLen;
+//    for (std::size_t i = 0; i < n_vectors; i++) {
+//      value_type v;
+//      if ( i != n_vectors - 1 || remaining == 0) {
+//        v.SetSize(Backend::kVecLen);
+//      } else {
+//        v.SetSize(remaining);
+//      }
+//      ret->push_back(std::move(v));
+//    }
+    ret->data_.resize(n_vectors);
+    for (std::size_t i = 0; i < n_vectors; i++) {
+      if ( i != n_vectors - 1 || remaining == 0) {
+        (*ret)[i].SetSize(Backend::kVecLen);
+      } else {
+        (*ret)[i].SetSize(remaining);
+      }
+    }
+
+    size_t counter = 0;
+    value_type* dest = nullptr;
+    for(int idx : indexes) {
+      size_t vector_idx = idx / Backend::kVecLen;
+      size_t vec_el_idx = idx % Backend::kVecLen;
+      size_t dest_idx = counter % Backend::kVecLen;
+      if (dest_idx == 0) {
+        dest = &((*ret)[counter / Backend::kVecLen]);
+      }
+      data_[vector_idx].CopyTo(vec_el_idx, dest_idx, dest);
+      counter++;
     }
   }
 
@@ -101,8 +134,9 @@ class daosoa {
     return data_[vector_idx].Set(vec_el_idx, value);
   }
 
-  value_type& operator[](std::size_t index) { return data_[index]; }
-  const value_type& operator[](std::size_t index) const { return data_[index]; }
+
+  Vc_ALWAYS_INLINE value_type& operator[](std::size_t index) { return data_[index]; }
+  Vc_ALWAYS_INLINE const value_type& operator[](std::size_t index) const { return data_[index]; }
 
   iterator begin() { return data_.begin(); }
   iterator end() { return data_.end(); }
@@ -115,7 +149,7 @@ class daosoa {
 //  }
 
  private:
-  std::vector<value_type> data_;
+  std::vector<value_type, Vc::Allocator<value_type> > data_;
 };
 
 }  // namespace bdm
