@@ -74,6 +74,16 @@ class Cell {
     return ret;
   }
 
+  Vc_ALWAYS_INLINE std::array<aosoa<Cell, Backend >, Backend::kVecLen>
+  GetNeighbors1(const daosoa<Cell, Backend >& all_cells) const {
+    std::array<aosoa<Cell, Backend>, Backend::kVecLen> ret;
+    const size_t size = size_;
+    for (size_t i = 0; i < size; i++) {
+      all_cells.Gather1(neighbors_[i], &(ret[i]));
+    }
+    return ret;
+  }
+
   Vc_ALWAYS_INLINE const std::array<std::vector<int>, Backend::kVecLen> GetNeighbors() const {
     return neighbors_;
   }

@@ -65,7 +65,7 @@ class DisplacementOp {
       // 3) Object avoidance force --------------------------------------------
       //  (We check for every neighbor object if they touch us, i.e. push us
       //  away)
-      const auto& neighbors = cell.GetNeighbors(*cells);
+      const auto& neighbors = cell.GetNeighbors1(*cells);
       // todo remove VcBackend with impl.
       for (size_t j = 0; j < VcBackend::kVecLen; j++) {
         for (size_t k = 0; k < neighbors.at(j).vectors(); k++) {

@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <type_traits>
+#include "aosoa.h"
 #include "backend.h"
 
 namespace bdm {
@@ -97,6 +98,35 @@ class daosoa {
 //      ret->push_back(std::move(v));
 //    }
     ret->data_.resize(n_vectors);
+    for (std::size_t i = 0; i < n_vectors; i++) {
+      if ( i != n_vectors - 1 || remaining == 0) {
+        (*ret)[i].SetSize(Backend::kVecLen);
+      } else {
+        (*ret)[i].SetSize(remaining);
+      }
+    }
+
+    size_t counter = 0;
+    value_type* dest = nullptr;
+    for(int idx : indexes) {
+      size_t vector_idx = idx / Backend::kVecLen;
+      size_t vec_el_idx = idx % Backend::kVecLen;
+      size_t dest_idx = counter % Backend::kVecLen;
+      if (dest_idx == 0) {
+        dest = &((*ret)[counter / Backend::kVecLen]);
+      }
+      data_[vector_idx].CopyTo(vec_el_idx, dest_idx, dest);
+      counter++;
+    }
+  }
+
+
+  void Gather1(const std::vector<int>& indexes, aosoa<T, Backend>* ret) const {
+    size_t scalars = indexes.size();
+    std::size_t n_vectors = scalars / Backend::kVecLen + (scalars % Backend::kVecLen ? 1 : 0);
+    std::size_t remaining = scalars % Backend::kVecLen;
+
+    ret->SetSize(n_vectors);
     for (std::size_t i = 0; i < n_vectors; i++) {
       if ( i != n_vectors - 1 || remaining == 0) {
         (*ret)[i].SetSize(Backend::kVecLen);
