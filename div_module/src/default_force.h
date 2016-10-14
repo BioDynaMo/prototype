@@ -19,22 +19,20 @@ class DefaultForce {
   DefaultForce(const DefaultForce&) = delete;
   DefaultForce& operator=(const DefaultForce&) = delete;
 
-  void forceBetweenSpheres(const std::array<double, 3>& ref_mass_location_s,
-                           double ref_diameter_s, double ref_iof_coefficient_s,
+  void forceBetweenSpheres(const std::array<real_v, 3>& ref_mass_location,
+                           const real_v& ref_diameter,
+                           const real_v& ref_iof_coefficient,
                            const std::array<real_v, 3>& nb_mass_location,
                            const real_v& nb_diameter,
                            const real_v& nb_iof_coefficient,
                            std::array<real_v, 3>* result) {
-   std::array<real_v, 3> c1 = {
-         real_v(ref_mass_location_s[0]),
-         real_v(ref_mass_location_s[1]),
-         real_v(ref_mass_location_s[2])};
-    real_v r1(0.5f * ref_diameter_s);
+    const auto& c1 = ref_mass_location;
+    real_v r1  = 0.5f * ref_diameter;
     const auto& c2 = nb_mass_location;
     real_v r2 = 0.5f * nb_diameter;
     // We take virtual bigger radii to have a distant interaction, to get a
     // desired density.
-    real_v additional_radius = 10.0f * Vc::min(real_v(ref_iof_coefficient_s), nb_iof_coefficient);
+    real_v additional_radius = 10.0f * Vc::min(ref_iof_coefficient, nb_iof_coefficient);
     r1 += additional_radius;
     r2 += additional_radius;
     // the 3 components of the vector c2 -> c1

@@ -136,16 +136,19 @@ class Cell {
     mass_location_[2] += delta[2];
   }
 
-  Vc_ALWAYS_INLINE void GetForceOn(const Cell<ScalarBackend>& reference,
+  Vc_ALWAYS_INLINE void GetForceOn(const std::array<real_v, 3>& ref_mass_location,
+                                   const real_v& ref_diameter,
                                    std::array<real_v, 3>* force) const {
     DefaultForce<Backend> default_force;  // todo inefficient -> make member
-    std::array<double, 3> ref_mass_location = {reference.mass_location_[0][0],
-                                               reference.mass_location_[1][0],
-                                               reference.mass_location_[2][0]};
+//    std::array<double, 3> ref_mass_location = {reference.mass_location_[0][0],
+//                                               reference.mass_location_[1][0],
+//                                               reference.mass_location_[2][0]};
+    real_v iof_coefficient(Param::kSphereDefaultInterObjectCoefficient);
+
     default_force.forceBetweenSpheres(
-        ref_mass_location, reference.diameter_[0],
-        Param::kSphereDefaultInterObjectCoefficient, mass_location_, diameter_,
-        real_v(Param::kSphereDefaultInterObjectCoefficient), force);
+        ref_mass_location, ref_diameter,
+        iof_coefficient, mass_location_, diameter_,
+        iof_coefficient, force);
   }
 
   //  Vc_ALWAYS_INLINE

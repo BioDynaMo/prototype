@@ -72,7 +72,14 @@ class DisplacementOp {
           auto& neighbor = neighbors.at(j)[k];
           std::array<real_v, 3> neighbor_force;
           Cell<ScalarBackend> cell_scalar = cell.Get(j);
-          neighbor.GetForceOn(cell_scalar, &neighbor_force);
+
+          const auto& cell_mass_location =  cell.GetMassLocation();
+          std::array<real_v, 3> scalar_mass_location = {
+              real_v(cell_mass_location[0][j]),
+              real_v(cell_mass_location[1][j]),
+              real_v(cell_mass_location[2][j])};
+          real_v scalar_diameter(cell.GetDiameter()[j]);
+          neighbor.GetForceOn(scalar_mass_location, scalar_diameter, &neighbor_force);
           if (k != neighbors.at(j).vectors() - 1) {
             translation_force_on_point_mass[0][j] +=
                 neighbor_force[0].sum();

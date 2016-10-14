@@ -14,9 +14,9 @@ TEST(DefaultForce, General) {
   if (real_v::Size < 2) {
     FAIL() << "Backend must at least support two elements for this test";
   }
-  std::array<double, 3> ref_mass_location_s = {1.1, 1.0, 0.9};
-  real_t ref_diameter_s = 8;
-  real_t ref_iof_coefficient_s = 0.15;
+  std::array<real_v, 3> ref_mass_location = {1.1, 1.0, 0.9};
+  real_v ref_diameter = 8;
+  real_v ref_iof_coefficient = 0.15;
   real_v nb_x((const real_t[]){0, 5});
   real_v nb_y((const real_t[]){0, 5});
   real_v nb_z((const real_t[]){0, 0});
@@ -26,8 +26,8 @@ TEST(DefaultForce, General) {
   std::array<real_v, 3> result;
 
   DefaultForce<VcBackend> force;
-  force.forceBetweenSpheres(ref_mass_location_s, ref_diameter_s,
-                            ref_iof_coefficient_s, nb_mass_location,
+  force.forceBetweenSpheres(ref_mass_location, ref_diameter,
+                            ref_iof_coefficient, nb_mass_location,
                             nb_diameter, nb_iof_coefficient, &result);
 
   // x component
@@ -46,9 +46,9 @@ TEST(DefaultForce, General) {
 TEST(DefaultForce, AllNonOverlapping) {
   using real_v = VcBackend::real_v;
   using real_t = real_v::value_type;
-  std::array<double, 3> ref_mass_location_s = {0, 0, 0};
-  real_t ref_diameter_s = 8;
-  real_t ref_iof_coefficient_s = 0.15;
+  std::array<real_v, 3> ref_mass_location = {0, 0, 0};
+  real_v ref_diameter = 8;
+  real_v ref_iof_coefficient = 0.15;
   real_v nb_x(11.01);
   real_v nb_y(0);
   real_v nb_z(0);
@@ -58,8 +58,8 @@ TEST(DefaultForce, AllNonOverlapping) {
   std::array<real_v, 3> result;
 
   DefaultForce<VcBackend> force;
-  force.forceBetweenSpheres(ref_mass_location_s, ref_diameter_s,
-                            ref_iof_coefficient_s, nb_mass_location,
+  force.forceBetweenSpheres(ref_mass_location, ref_diameter,
+                            ref_iof_coefficient, nb_mass_location,
                             nb_diameter, nb_iof_coefficient, &result);
 
 
@@ -79,9 +79,9 @@ TEST(DefaultForce, OneNonOverlapping) {
   if (real_v::Size < 2) {
     FAIL() << "Backend must at least support two elements for this test";
   }
-  std::array<double, 3> ref_mass_location_s = {0, 0, 0};
-  real_t ref_diameter_s = 8;
-  real_t ref_iof_coefficient_s = 0.15;
+  std::array<real_v, 3> ref_mass_location = {0, 0, 0};
+  real_v ref_diameter = 8;
+  real_v ref_iof_coefficient = 0.15;
   real_v nb_x((const real_t[]){11.01, 8});
   real_v nb_y((const real_t[]){0, 0});
   real_v nb_z((const real_t[]){0, 0});
@@ -91,8 +91,8 @@ TEST(DefaultForce, OneNonOverlapping) {
   std::array<real_v, 3> result;
 
   DefaultForce<VcBackend> force;
-  force.forceBetweenSpheres(ref_mass_location_s, ref_diameter_s,
-      ref_iof_coefficient_s, nb_mass_location,
+  force.forceBetweenSpheres(ref_mass_location, ref_diameter,
+      ref_iof_coefficient, nb_mass_location,
       nb_diameter, nb_iof_coefficient, &result);
 
   // x component
@@ -108,9 +108,9 @@ TEST(DefaultForce, OneNonOverlapping) {
 TEST(DefaultForce, AllAtSamePosition) {
   using real_v = VcBackend::real_v;
   using real_t = real_v::value_type;
-  std::array<double, 3> ref_mass_location_s = {0, 0, 0};
-  real_t ref_diameter_s = 8;
-  real_t ref_iof_coefficient_s = 0.15;
+  std::array<real_v, 3> ref_mass_location = {0, 0, 0};
+  real_v ref_diameter = 8;
+  real_v ref_iof_coefficient = 0.15;
   real_v nb_x(0);
   real_v nb_y(0);
   real_v nb_z(0);
@@ -120,8 +120,8 @@ TEST(DefaultForce, AllAtSamePosition) {
   std::array<real_v, 3> result;
 
   DefaultForce<VcBackend> force;
-  force.forceBetweenSpheres(ref_mass_location_s, ref_diameter_s,
-      ref_iof_coefficient_s, nb_mass_location,
+  force.forceBetweenSpheres(ref_mass_location, ref_diameter,
+      ref_iof_coefficient, nb_mass_location,
       nb_diameter, nb_iof_coefficient, &result);
 
   // random number must be in interval [-3.0, 3.0]
