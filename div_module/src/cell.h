@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cmath>
+#include "array.h"
 #include "backend.h"
 #include "daosoa.h"
 #include "default_force.h"
@@ -62,19 +63,19 @@ class Cell {
 
   Vc_ALWAYS_INLINE const std::array<real_v, 3>& GetMassLocation () const { return mass_location_; }
 
-  Vc_ALWAYS_INLINE std::array<daosoa<Cell, Backend >, Backend::kVecLen>
-  GetNeighbors(const daosoa<Cell, Backend >& all_cells) const {
-    std::array<daosoa<Cell, Backend>, Backend::kVecLen> ret;
-    const size_t size = size_;
-    for (size_t i = 0; i < size; i++) {
-      daosoa<Cell, Backend> neighbors;
-      all_cells.Gather(neighbors_[i], &neighbors);
-      ret[i] = std::move(neighbors);
-    }
-    return ret;
-  }
+//  Vc_ALWAYS_INLINE std::array<daosoa<Cell, Backend >, Backend::kVecLen>
+//  GetNeighbors(const daosoa<Cell, Backend >& all_cells) const {
+//    std::array<daosoa<Cell, Backend>, Backend::kVecLen> ret;
+//    const size_t size = size_;
+//    for (size_t i = 0; i < size; i++) {
+//      daosoa<Cell, Backend> neighbors;
+//      all_cells.Gather(neighbors_[i], &neighbors);
+//      ret[i] = std::move(neighbors);
+//    }
+//    return ret;
+//  }
 
-  Vc_ALWAYS_INLINE std::array<aosoa<Cell, Backend >, Backend::kVecLen>
+  Vc_ALWAYS_INLINE std::array<aosoa<Cell, Backend>, Backend::kVecLen>
   GetNeighbors1(const daosoa<Cell, Backend >& all_cells) const {
     std::array<aosoa<Cell, Backend>, Backend::kVecLen> ret;
     const size_t size = size_;
@@ -84,7 +85,7 @@ class Cell {
     return ret;
   }
 
-  Vc_ALWAYS_INLINE const std::array<std::vector<int>, Backend::kVecLen> GetNeighbors() const {
+  Vc_ALWAYS_INLINE const std::array<array<int, 8>, Backend::kVecLen> GetNeighbors() const {
     return neighbors_;
   }
 
@@ -103,7 +104,7 @@ class Cell {
   Vc_ALWAYS_INLINE void SetPosition(const std::array<real_v, 3>& position) { position_ = position; }
   Vc_ALWAYS_INLINE void SetTractorForce(const std::array<real_v, 3>& tractor_force) { tractor_force_ = tractor_force; }
   Vc_ALWAYS_INLINE void SetNeighbors(
-      const std::array<std::vector<int>, Backend::kVecLen>& neighbors) {
+      const std::array<array<int, 8>, Backend::kVecLen>& neighbors) {
     neighbors_ = neighbors;
   }
 
@@ -178,7 +179,7 @@ class Cell {
   real_v mass_;
   //  bool_v run_physics_;
   // stores a list of neighbor ids for each scalar cell
-  std::array<std::vector<int>, Backend::kVecLen> neighbors_;
+  std::array<bdm::array<int, 8>, Backend::kVecLen> neighbors_;
 };
 
 // ----------------------------------------------------------------------------

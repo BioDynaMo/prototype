@@ -84,7 +84,7 @@ class NeighborOp {
     my_kd_tree_t index(3, nf_cells, KDTreeSingleIndexAdaptorParams(10));
     index.buildIndex();
 
-    std::vector<std::array<std::vector<int>, VcBackend::kVecLen> > neighbors(
+    std::vector<std::array<bdm::array<int, 8>, VcBackend::kVecLen> > neighbors(
         cells->vectors());
 
     // calc neighbors
@@ -116,14 +116,15 @@ class NeighborOp {
 
       // transform result (change data structure - remove self from list)
 //      std::cout << "n_matches: " << n_matches << std::endl;
-      std::vector<int>   i_neighbors(n_matches - 1);
+      bdm::array<int, 8>   i_neighbors;
+      i_neighbors.SetSize(n_matches - 1);
       size_t counter = 0;
       for (size_t j = 0; j < n_matches; j++) {
         if (ret_matches[j].first != i) {
           i_neighbors[counter++] = ret_matches[j].first;
         }
       }
-      neighbors[vector_idx][scalar_idx] = i_neighbors;
+      neighbors[vector_idx][scalar_idx] = std::move(i_neighbors);
     }
 
     // update neighbors

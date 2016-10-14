@@ -80,49 +80,49 @@ class daosoa {
     last->Append(value);
   }
 
-  void Gather(const std::vector<int>& indexes, daosoa<T, Backend>* ret) const {
-//    for (int idx : indexes) {
-//      const auto& scalar_element = GetScalar(idx);
-//      ret->push_back(scalar_element);
-//    }
-    size_t scalars = indexes.size();
-    std::size_t n_vectors = scalars / Backend::kVecLen + (scalars % Backend::kVecLen ? 1 : 0);
-    std::size_t remaining = scalars % Backend::kVecLen;
+//  void Gather(const std::vector<int>& indexes, daosoa<T, Backend>* ret) const {
+////    for (int idx : indexes) {
+////      const auto& scalar_element = GetScalar(idx);
+////      ret->push_back(scalar_element);
+////    }
+//    size_t scalars = indexes.size();
+//    std::size_t n_vectors = scalars / Backend::kVecLen + (scalars % Backend::kVecLen ? 1 : 0);
+//    std::size_t remaining = scalars % Backend::kVecLen;
+////    for (std::size_t i = 0; i < n_vectors; i++) {
+////      value_type v;
+////      if ( i != n_vectors - 1 || remaining == 0) {
+////        v.SetSize(Backend::kVecLen);
+////      } else {
+////        v.SetSize(remaining);
+////      }
+////      ret->push_back(std::move(v));
+////    }
+//    ret->data_.resize(n_vectors);
 //    for (std::size_t i = 0; i < n_vectors; i++) {
-//      value_type v;
 //      if ( i != n_vectors - 1 || remaining == 0) {
-//        v.SetSize(Backend::kVecLen);
+//        (*ret)[i].SetSize(Backend::kVecLen);
 //      } else {
-//        v.SetSize(remaining);
+//        (*ret)[i].SetSize(remaining);
 //      }
-//      ret->push_back(std::move(v));
 //    }
-    ret->data_.resize(n_vectors);
-    for (std::size_t i = 0; i < n_vectors; i++) {
-      if ( i != n_vectors - 1 || remaining == 0) {
-        (*ret)[i].SetSize(Backend::kVecLen);
-      } else {
-        (*ret)[i].SetSize(remaining);
-      }
-    }
-
-    size_t counter = 0;
-    value_type* dest = nullptr;
-    for(int idx : indexes) {
-      size_t vector_idx = idx / Backend::kVecLen;
-      size_t vec_el_idx = idx % Backend::kVecLen;
-      size_t dest_idx = counter % Backend::kVecLen;
-      if (dest_idx == 0) {
-        dest = &((*ret)[counter / Backend::kVecLen]);
-      }
-      data_[vector_idx].CopyTo(vec_el_idx, dest_idx, dest);
-      counter++;
-    }
-  }
+//
+//    size_t counter = 0;
+//    value_type* dest = nullptr;
+//    for(int idx : indexes) {
+//      size_t vector_idx = idx / Backend::kVecLen;
+//      size_t vec_el_idx = idx % Backend::kVecLen;
+//      size_t dest_idx = counter % Backend::kVecLen;
+//      if (dest_idx == 0) {
+//        dest = &((*ret)[counter / Backend::kVecLen]);
+//      }
+//      data_[vector_idx].CopyTo(vec_el_idx, dest_idx, dest);
+//      counter++;
+//    }
+//  }
 
 
-  void Gather1(const std::vector<int>& indexes, aosoa<T, Backend>* ret) const {
-    size_t scalars = indexes.size();
+  void Gather1(const bdm::array<int, 8>& indexes, aosoa<T, Backend>* ret) const {
+    const size_t scalars = indexes.size();
     std::size_t n_vectors = scalars / Backend::kVecLen + (scalars % Backend::kVecLen ? 1 : 0);
     std::size_t remaining = scalars % Backend::kVecLen;
 
@@ -137,7 +137,8 @@ class daosoa {
 
     size_t counter = 0;
     value_type* dest = nullptr;
-    for(int idx : indexes) {
+    for(size_t i = 0; i < scalars; i++) {
+      int idx = indexes[i];
       size_t vector_idx = idx / Backend::kVecLen;
       size_t vec_el_idx = idx % Backend::kVecLen;
       size_t dest_idx = counter % Backend::kVecLen;

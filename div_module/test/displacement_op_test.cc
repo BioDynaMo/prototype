@@ -28,8 +28,13 @@ TEST (DisplacementOpTest, Compute) {
       real_v((const real_t[]){0.97, 1.03})
   };
 
-  std::array<std::vector<int>, VcBackend::kVecLen> neighbors = {std::vector<int>{1},
-                                                                std::vector<int>{0}};
+  bdm::array<int, 8> neighbor_1;
+  neighbor_1[0] = 1;
+  neighbor_1.SetSize(1);
+  bdm::array<int, 8> neighbor_2;
+  neighbor_2[0] = 0;
+  neighbor_2.SetSize(1);
+  std::array<bdm::array<int, 8>, VcBackend::kVecLen> neighbors = {neighbor_1, neighbor_2};
 
   Cell<VcBackend> cell(diameter);
   cell.SetDiameter(diameter);
