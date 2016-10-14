@@ -54,10 +54,9 @@ class DefaultForce {
     // location
     // fixme performance - generates a lot of random numbers which I think are hardly
     // ever used P(distance_between_centers < 0.00000001) very small
-    auto random_force = random_.NextNoise<VcBackend>(VcBackend::real_v(3.0));
     auto distance_lt_min = distance_between_centers < real_v(0.00000001);   // fixme should be param or constant
     if (distance_lt_min.isFull()) {
-      *result = random_force;
+      *result = random_.NextNoise<VcBackend>(VcBackend::real_v(3.0));
       return;
     }
 
@@ -68,22 +67,19 @@ class DefaultForce {
     real_v F = k * delta - gamma * Vc::sqrt(R * delta);
 
     real_v module = F / distance_between_centers;
-    std::array<real_v, 3> force2on1(
-        {module * comp1, module * comp2, module * comp3});
+    (*result) =
+        {module * comp1, module * comp2, module * comp3};
 
-    // fixme performance improvement possible here? - delta_lt_0 unlikely
-    std::array<real_v, 3> ret;
-    ret[0] = Vc::iif(delta_lt_0, real_v(0.0), force2on1[0] );
-    ret[1] = Vc::iif(delta_lt_0, real_v(0.0), force2on1[1] );
-    ret[2] = Vc::iif(delta_lt_0, real_v(0.0), force2on1[2] );
-
-    if(!distance_lt_min.isEmpty()) {
-      ret[0] = Vc::iif(distance_lt_min, random_force[0], ret[0]);
-      ret[1] = Vc::iif(distance_lt_min, random_force[1], ret[1]);
-      ret[2] = Vc::iif(distance_lt_min, random_force[2], ret[2]);
+    if(!delta_lt_0.isEmpty()) {
+      (*result)[0].setZero(delta_lt_0);
+      (*result)[1].setZero(delta_lt_0);
+      (*result)[2].setZero(delta_lt_0);
+    } else if(!distance_lt_min.isEmpty()) {
+      auto random_force = random_.NextNoise<VcBackend>(VcBackend::real_v(3.0));
+      (*result)[0] = Vc::iif(distance_lt_min, random_force[0], (*result)[0]);
+      (*result)[1] = Vc::iif(distance_lt_min, random_force[1], (*result)[1]);
+      (*result)[2] = Vc::iif(distance_lt_min, random_force[2], (*result)[2]);
     }
-
-    *result = ret;
   }
 
  private:
