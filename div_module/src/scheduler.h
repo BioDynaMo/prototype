@@ -22,7 +22,8 @@ class Scheduler {
     NeighborOp neighbor;
     bool n = true;
     while (steps-- > 0) {
-      auto cells = rm->GetCells(); // todo why does this compile GetCells returns const?!?
+      auto cells = rm->GetCells();  // todo why does this compile GetCells
+                                    // returns const?!?
       physics.Compute(&cells);
       // todo transfrom cells based on opdefinition
       biology.Compute(&cells);

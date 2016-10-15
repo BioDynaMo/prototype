@@ -10,7 +10,8 @@ struct Math {
   static constexpr double kPi = 3.141592653589793238462643383279502884;
 
   template <typename Backend>
-  static typename Backend::real_v Norm(const std::array<typename Backend::real_v, 3>& a) {
+  static typename Backend::real_v Norm(
+      const std::array<typename Backend::real_v, 3>& a) {
     using real_v = typename Backend::real_v;
     real_v norm;
     for (size_t i = 0; i < real_v::Size; i++) {

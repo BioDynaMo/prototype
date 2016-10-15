@@ -23,7 +23,8 @@ using bdm::Timing;
 using bdm::TimingAggregator;
 using bdm::VcBackend;
 
-void execute(size_t cells_per_dim, size_t iterations, TimingAggregator* statistic) {
+void execute(size_t cells_per_dim, size_t iterations,
+             TimingAggregator* statistic) {
   const unsigned space = 20;
 
   daosoa<Cell> cells(cells_per_dim * cells_per_dim * cells_per_dim);
@@ -33,7 +34,8 @@ void execute(size_t cells_per_dim, size_t iterations, TimingAggregator* statisti
       for (size_t j = 0; j < cells_per_dim; j++) {
         for (size_t k = 0; k < cells_per_dim; k++) {
           // todo improve syntax
-          Cell<ScalarBackend> cell(std::array<ScalarBackend::real_v, 3> { i * space, j * space, k * space });
+          Cell<ScalarBackend> cell(std::array<ScalarBackend::real_v, 3>{
+              i * space, j * space, k * space});
           cell.SetDiameter(30);
           cell.SetAdherence(0.4);
           cell.SetMass(1.0);
@@ -53,7 +55,7 @@ void execute(size_t cells_per_dim, size_t iterations, TimingAggregator* statisti
   {
     Timing timing("div_op", statistic);
     bdm::DividingCellOp biology;
-    for( size_t i = 0; i < iterations; i++) {
+    for (size_t i = 0; i < iterations; i++) {
       biology.Compute(&cells);
     }
   }
@@ -61,17 +63,19 @@ void execute(size_t cells_per_dim, size_t iterations, TimingAggregator* statisti
   {
     Timing timing("displacement op", statistic);
     bdm::DisplacementOp op;
-    for( size_t i = 0; i < iterations; i++) {
+    for (size_t i = 0; i < iterations; i++) {
       op.Compute(&cells);
     }
   }
 }
 
-void benchmark(size_t cells_per_dim, size_t iterations, TimingAggregator* statistic) {
+void benchmark(size_t cells_per_dim, size_t iterations,
+               TimingAggregator* statistic) {
   const int max_threads = omp_get_max_threads();
   for (int i = 1; i <= max_threads; i *= 2) {
     std::stringstream ss;
-    ss << i << " thread(s) - " << cells_per_dim << " cells per dim - " << iterations << " iteration(s)";
+    ss << i << " thread(s) - " << cells_per_dim << " cells per dim - "
+       << iterations << " iteration(s)";
     statistic->AddDescription(ss.str());
     omp_set_num_threads(i);
     execute(cells_per_dim, iterations, statistic);
@@ -82,9 +86,9 @@ int main(int args, char** argv) {
   std::cout << "Cell<VcBackend> size: " << sizeof(Cell<VcBackend>) << std::endl;
 
   TimingAggregator statistic;
-  if(args > 1 && std::string(argv[1]) == "--scaling-analysis") {
+  if (args > 1 && std::string(argv[1]) == "--scaling-analysis") {
     benchmark(4, 1e5, &statistic);
-  } else if(args > 1 && std::string(argv[1]) == "--full-analysis") {
+  } else if (args > 1 && std::string(argv[1]) == "--full-analysis") {
     benchmark(4, 1e5, &statistic);
     benchmark(128, 1, &statistic);
   } else {

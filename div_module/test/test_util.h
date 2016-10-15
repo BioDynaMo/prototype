@@ -3,8 +3,7 @@ namespace bdm {
 
 template <typename T>
 struct abs_error {
-  static_assert(std::is_same<T,   double>::value ||
-                std::is_same<T,    float>::value,
+  static_assert(std::is_same<T, double>::value || std::is_same<T, float>::value,
                 "abs_error<T> may only be used with T = { float, double }");
   static constexpr double value = 1e-24;
 };

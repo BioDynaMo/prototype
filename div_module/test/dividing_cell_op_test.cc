@@ -5,7 +5,7 @@
 
 namespace bdm {
 
-TEST (DividingCellOpTest, Compute) {
+TEST(DividingCellOpTest, Compute) {
   using real_v = VcBackend::real_v;
   if (VcBackend::real_v::Size < 2) {
     FAIL() << "Backend must at least support two elements for this test";
@@ -21,12 +21,15 @@ TEST (DividingCellOpTest, Compute) {
   op.Compute(&cells);
 
   auto final_diameter = cells[0].GetDiameter();
-  EXPECT_NEAR(19.005288996600001, final_diameter[0], abs_error<real_v::value_type>::value);
+  EXPECT_NEAR(19.005288996600001, final_diameter[0],
+              abs_error<real_v::value_type>::value);
   EXPECT_NEAR(21, final_diameter[1], abs_error<real_v::value_type>::value);
 
   auto final_volume = cells[0].GetVolume();
-  EXPECT_NEAR(3594.3640018287319, final_volume[0], abs_error<real_v::value_type>::value);
-  EXPECT_NEAR(4849.0482608158463, final_volume[1], abs_error<real_v::value_type>::value);
+  EXPECT_NEAR(3594.3640018287319, final_volume[0],
+              abs_error<real_v::value_type>::value);
+  EXPECT_NEAR(4849.0482608158463, final_volume[1],
+              abs_error<real_v::value_type>::value);
 }
 
 }  // namespace bdm

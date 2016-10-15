@@ -6,17 +6,18 @@
 
 namespace bdm {
 
-template<typename Op>
+template <typename Op>
 class VTuneOpWrapper : public Op {
  public:
   /// perfect forwarding ctor
   template <typename... Args>
-  VTuneOpWrapper(Args&&... args) : Op{std::forward<Args>(args)...} {
+  VTuneOpWrapper(Args&&... args)
+      : Op{std::forward<Args>(args)...} {
     domain_ = __itt_domain_create("MyTraces.MyDomain");
     task_ = __itt_string_handle_create(typeid(Op).name());
   }
 
-  template<typename daosoa>
+  template <typename daosoa>
   void Compute(daosoa* cells) const {
     __itt_task_begin(domain_, __itt_null, __itt_null, task_);
     Op::Compute(cells);
@@ -26,7 +27,6 @@ class VTuneOpWrapper : public Op {
  private:
   __itt_domain* domain_;
   __itt_string_handle* task_;
-
 };
 
 }  // namespace bdm

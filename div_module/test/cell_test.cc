@@ -3,7 +3,7 @@
 
 namespace bdm {
 
-TEST (CellTest, AppendScalarCellToVectorCell) {
+TEST(CellTest, AppendScalarCellToVectorCell) {
   Cell<ScalarBackend> cell(3.14);
   EXPECT_DOUBLE_EQ(cell.GetDiameter()[0], 3.14);
   Cell<VcBackend> cells;
@@ -12,6 +12,6 @@ TEST (CellTest, AppendScalarCellToVectorCell) {
   cells.Append(cell);
   EXPECT_DOUBLE_EQ(cells.GetDiameter()[0], 3.14);
 }
-//todo(lukas) add more tests
+// todo(lukas) add more tests
 
 }  // namespace bdm

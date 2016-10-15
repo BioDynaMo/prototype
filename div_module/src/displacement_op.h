@@ -25,7 +25,7 @@ class DisplacementOp {
   template <typename daosoa>
   void Compute(daosoa* cells) const {
     const size_t n_vectors = cells->vectors();
-   #pragma omp parallel for
+#pragma omp parallel for
     for (size_t i = 0; i < n_vectors; i++) {
       auto& cell = (*cells)[i];
       // Basically, the idea is to make the sum of all the forces acting
@@ -73,29 +73,24 @@ class DisplacementOp {
           std::array<real_v, 3> neighbor_force;
           Cell<ScalarBackend> cell_scalar = cell.Get(j);
 
-          const auto& cell_mass_location =  cell.GetMassLocation();
+          const auto& cell_mass_location = cell.GetMassLocation();
           std::array<real_v, 3> scalar_mass_location = {
               real_v(cell_mass_location[0][j]),
               real_v(cell_mass_location[1][j]),
               real_v(cell_mass_location[2][j])};
           real_v scalar_diameter(cell.GetDiameter()[j]);
-          neighbor.GetForceOn(scalar_mass_location, scalar_diameter, &neighbor_force);
+          neighbor.GetForceOn(scalar_mass_location, scalar_diameter,
+                              &neighbor_force);
           if (k != neighbors.at(j).vectors() - 1) {
-            translation_force_on_point_mass[0][j] +=
-                neighbor_force[0].sum();
-            translation_force_on_point_mass[1][j] +=
-                neighbor_force[1].sum();
-            translation_force_on_point_mass[2][j] +=
-                neighbor_force[2].sum();
+            translation_force_on_point_mass[0][j] += neighbor_force[0].sum();
+            translation_force_on_point_mass[1][j] += neighbor_force[1].sum();
+            translation_force_on_point_mass[2][j] += neighbor_force[2].sum();
           } else {
             // if vector is not full manually add up forces
             for (size_t l = 0; l < neighbor.Size(); l++) {
-              translation_force_on_point_mass[0][j] +=
-                  neighbor_force[0][l];
-              translation_force_on_point_mass[1][j] +=
-                  neighbor_force[1][l];
-              translation_force_on_point_mass[2][j] +=
-                  neighbor_force[2][l];
+              translation_force_on_point_mass[0][j] += neighbor_force[0][l];
+              translation_force_on_point_mass[1][j] += neighbor_force[1][l];
+              translation_force_on_point_mass[2][j] += neighbor_force[2][l];
             }
           }
         }
@@ -162,7 +157,7 @@ class DisplacementOp {
       cell.UpdateMassLocation(movement_at_next_step);
       // FIXME removed rotation
       // updating some values :
-//      UpdateSpatialOrganizationNodePosition(&cell);
+      //      UpdateSpatialOrganizationNodePosition(&cell);
       cell.SetPosition(cell.GetMassLocation());
       // Re-schedule me and every one that has something to do with me :
       // cells->setOnTheSchedulerListForPhysicalObjects(true);
@@ -188,18 +183,19 @@ class DisplacementOp {
         mass_location[0] - current_center[0],
         mass_location[1] - current_center[1],
         mass_location[2] - current_center[2]};
-//    auto offset = Math::Norm<VcBackend>(displacement);
-//    auto& diameter = cell->GetDiameter();
+    //    auto offset = Math::Norm<VcBackend>(displacement);
+    //    auto& diameter = cell->GetDiameter();
     // todo what is the purpose of this conditional?
-//    auto ifmask = offset > diameter * 0.25 || offset > 5; //fixme magic numbers 0.25 & 0.0025
-//    auto noise = Random::NextNoise<VcBackend>(diameter * 0.025);
-//    displacement[0] += noise[0];
-//    displacement[1] += noise[1];
-//    displacement[2] += noise[2];
-//    displacement[0].setZeroInverted(ifmask);
-//    displacement[1].setZeroInverted(ifmask);
-//    displacement[2].setZeroInverted(ifmask);
-    std::array<VcBackend::real_v, 3> new_position {
+    //    auto ifmask = offset > diameter * 0.25 || offset > 5; //fixme magic
+    //    numbers 0.25 & 0.0025
+    //    auto noise = Random::NextNoise<VcBackend>(diameter * 0.025);
+    //    displacement[0] += noise[0];
+    //    displacement[1] += noise[1];
+    //    displacement[2] += noise[2];
+    //    displacement[0].setZeroInverted(ifmask);
+    //    displacement[1].setZeroInverted(ifmask);
+    //    displacement[2].setZeroInverted(ifmask);
+    std::array<VcBackend::real_v, 3> new_position{
         current_center[0] + displacement[0],
         current_center[1] + displacement[1],
         current_center[2] + displacement[2],

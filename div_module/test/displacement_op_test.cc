@@ -5,7 +5,7 @@
 
 namespace bdm {
 
-TEST (DisplacementOpTest, Compute) {
+TEST(DisplacementOpTest, Compute) {
   using real_v = VcBackend::real_v;
   using real_t = real_v::value_type;
   if (real_v::Size < 2) {
@@ -16,11 +16,9 @@ TEST (DisplacementOpTest, Compute) {
   real_v adherence((const real_t[]){0.3, 0.4});
   real_v mass((const real_t[]){1.4, 1.1});
 
-  std::array<real_v, 3> position = {
-      real_v((const real_t[]){0, 0}),
-      real_v((const real_t[]){0, 5}),
-      real_v((const real_t[]){0, 0})
-  };
+  std::array<real_v, 3> position = {real_v((const real_t[]){0, 0}),
+                                    real_v((const real_t[]){0, 5}),
+                                    real_v((const real_t[]){0, 0})};
 
   // todo generate target values with this tf
   // std::array<real_v, 3> tractor_force = {
@@ -35,7 +33,8 @@ TEST (DisplacementOpTest, Compute) {
   bdm::array<int, 8> neighbor_2;
   neighbor_2[0] = 0;
   neighbor_2.SetSize(1);
-  std::array<bdm::array<int, 8>, VcBackend::kVecLen> neighbors = {neighbor_1, neighbor_2};
+  std::array<bdm::array<int, 8>, VcBackend::kVecLen> neighbors = {neighbor_1,
+                                                                  neighbor_2};
 
   Cell<VcBackend> cell(diameter);
   cell.SetDiameter(diameter);
@@ -56,11 +55,13 @@ TEST (DisplacementOpTest, Compute) {
   auto& final_position = cells[0].GetPosition();
   // cell 1
   EXPECT_NEAR(0, final_position[0][0], abs_error<real_t>::value);
-  EXPECT_NEAR(-0.07797206232558615, final_position[1][0], abs_error<real_t>::value);
+  EXPECT_NEAR(-0.07797206232558615, final_position[1][0],
+              abs_error<real_t>::value);
   EXPECT_NEAR(0, final_position[2][0], abs_error<real_t>::value);
   // cell 2
   EXPECT_NEAR(0, final_position[0][1], abs_error<real_t>::value);
-  EXPECT_NEAR(5.0992371702325645, final_position[1][1], abs_error<real_t>::value);
+  EXPECT_NEAR(5.0992371702325645, final_position[1][1],
+              abs_error<real_t>::value);
   EXPECT_NEAR(0, final_position[2][1], abs_error<real_t>::value);
 
   // check if tractor_force has been reset to zero

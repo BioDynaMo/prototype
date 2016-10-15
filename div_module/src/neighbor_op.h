@@ -74,8 +74,8 @@ class NeighborOp {
 
     // construct a kd-tree index:
     typedef KDTreeSingleIndexAdaptor<
-        L2_Simple_Adaptor<VcBackend::real_t, NanoFlann2Daosoa>, NanoFlann2Daosoa,
-        3 /* dim */
+        L2_Simple_Adaptor<VcBackend::real_t, NanoFlann2Daosoa>,
+        NanoFlann2Daosoa, 3 /* dim */
         > my_kd_tree_t;
 
     // three dimensions; max leafs: 10
@@ -85,9 +85,9 @@ class NeighborOp {
     std::vector<std::array<bdm::array<int, 8>, VcBackend::kVecLen> > neighbors(
         cells->vectors());
 
-    // calc neighbors
-    //std::cout << "number of elements " << cells->elements() << std::endl;
-    #pragma omp parallel for
+// calc neighbors
+// std::cout << "number of elements " << cells->elements() << std::endl;
+#pragma omp parallel for
     for (size_t i = 0; i < cells->elements(); i++) {
       const auto vector_idx = i / VcBackend::kVecLen;
       const auto scalar_idx = i % VcBackend::kVecLen;
@@ -105,14 +105,14 @@ class NeighborOp {
       auto cell = cells->GetScalar(i);
       const auto& position = cell.GetPosition();
       const VcBackend::real_t query_pt[3] = {position[0][0], position[1][0],
-                                  position[2][0]};
+                                             position[2][0]};
 
       // calculate neighbors
       const size_t n_matches =
           index.radiusSearch(&query_pt[0], search_radius, ret_matches, params);
 
       // transform result (change data structure - remove self from list)
-      bdm::array<int, 8>   i_neighbors;
+      bdm::array<int, 8> i_neighbors;
       i_neighbors.SetSize(n_matches - 1);
       size_t counter = 0;
       for (size_t j = 0; j < n_matches; j++) {
@@ -124,7 +124,7 @@ class NeighborOp {
     }
 
     // update neighbors
-    #pragma omp parallel for
+#pragma omp parallel for
     for (size_t i = 0; i < cells->vectors(); i++) {
       (*cells)[i].SetNeighbors(neighbors[i]);
     }

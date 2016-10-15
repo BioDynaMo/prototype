@@ -23,16 +23,16 @@ struct ScalarBackend {
 
 using DefaultBackend = VcBackend;
 
-template<typename T>
+template <typename T>
 struct is_scalar {
   static const bool value = false;
 };
 
-template<template<typename> class Container>
+template <template <typename> class Container>
 struct is_scalar<Container<ScalarBackend> > {
   static const bool value = true;
 };
 
-} // namespace bdm
+}  // namespace bdm
 
 #endif  // BACKEND_H_

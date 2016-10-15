@@ -3,7 +3,6 @@
 #include "cell.h"
 #include "daosoa.h"
 
-
 namespace bdm {
 
 /// this class is used as payload for daosoa tests
@@ -15,8 +14,8 @@ class Object {
   template <typename T>
   friend class Object;
 
-  Object() { }
-  explicit Object(real_v id) : id_ {id} { }
+  Object() {}
+  explicit Object(real_v id) : id_{id} {}
 
   const real_v& GetId() { return id_; }
 
@@ -33,25 +32,17 @@ class Object {
     id_[idx] = object.id_[0];
   }
 
-  void Append(const Object<ScalarBackend>& object) {
-    Set(size_++, object);
-  }
+  void Append(const Object<ScalarBackend>& object) { Set(size_++, object); }
 
   bool is_full() const { return Size() == Backend::kVecLen; }
 
   constexpr size_t VecLength() { return Backend::kVecLen; }
 
-  size_t Size() const {
-    return size_;
-  }
+  size_t Size() const { return size_; }
 
-  void SetUninitialized() {
-    size_ = 0;
-  }
+  void SetUninitialized() { size_ = 0; }
 
-  void SetSize(std::size_t size) {
-    size_ = size;
-  }
+  void SetSize(std::size_t size) { size_ = size; }
 
   void CopyTo(std::size_t from_idx, std::size_t to_idx,
               Object<VcBackend>* dest) const {
@@ -63,7 +54,7 @@ class Object {
   real_v id_;
 };
 
-TEST (daosoaTest, PushBackOfScalarAndVectorCell) {
+TEST(daosoaTest, PushBackOfScalarAndVectorCell) {
   // push_back
   Cell<VcBackend> vc_cells;
   Cell<ScalarBackend> scalar_cell;
@@ -74,10 +65,11 @@ TEST (daosoaTest, PushBackOfScalarAndVectorCell) {
 
   daosoa<Cell, ScalarBackend> aos;
   aos.push_back(scalar_cell);
-  //  aos.push_back(vc_cells);  // should not compile -> todo(lukas) make compile time tests
+  //  aos.push_back(vc_cells);  // should not compile -> todo(lukas) make
+  //  compile time tests
 }
 
-TEST (daosoaTest, PushBackAndGetScalars) {
+TEST(daosoaTest, PushBackAndGetScalars) {
   daosoa<Object> objects;
 
   // create objects
@@ -95,7 +87,7 @@ TEST (daosoaTest, PushBackAndGetScalars) {
   }
 }
 
-TEST (daosoaTest, ReserveElementsSetScalar) {
+TEST(daosoaTest, ReserveElementsSetScalar) {
   const size_t elements = VcBackend::kVecLen * 2 + 2;
   daosoa<Object> objects(elements);
 
@@ -113,7 +105,7 @@ TEST (daosoaTest, ReserveElementsSetScalar) {
   }
 }
 
-TEST (daosoaTest, Gather) {
+TEST(daosoaTest, Gather) {
   daosoa<Object> objects;
 
   // create objects
@@ -130,7 +122,8 @@ TEST (daosoaTest, Gather) {
   indexes.SetSize(4);
   objects.Gather(indexes, &gathered);
   // check if it returns the correct objects
-  size_t target_n_vectors = 4 / VcBackend::kVecLen + (4 % VcBackend::kVecLen ? 1 : 0);
+  size_t target_n_vectors =
+      4 / VcBackend::kVecLen + (4 % VcBackend::kVecLen ? 1 : 0);
   EXPECT_EQ(target_n_vectors, gathered.vectors());
   size_t counter = 0;
   for (size_t i = 0; i < gathered.vectors(); i++) {
@@ -140,14 +133,15 @@ TEST (daosoaTest, Gather) {
   }
 }
 
-TEST (daosoaTest, SizeAndElements) {
+TEST(daosoaTest, SizeAndElements) {
   daosoa<Object> objects;
 
   EXPECT_EQ(size_t(0), objects.vectors());
   EXPECT_EQ(size_t(0), objects.elements());
   objects.push_back(Object<VcBackend>());
   EXPECT_EQ(size_t(1), objects.vectors());
-  EXPECT_EQ(Vc::double_v::Size, objects.elements()); // fixme replace with VcBackend
+  EXPECT_EQ(Vc::double_v::Size,
+            objects.elements());  // fixme replace with VcBackend
   objects.push_back(Object<ScalarBackend>());
   EXPECT_EQ(size_t(2), objects.vectors());
   EXPECT_EQ(VcBackend::kVecLen + 1, objects.elements());

@@ -22,11 +22,10 @@ class Cell {
   template <typename T>
   friend class Cell;
 
-  Cell() { }
-  Cell(real_v diameter) : diameter_{diameter} {
-    UpdateVolume();
-  }
-  Cell(const std::array<real_v, 3>& position) : position_(position), mass_location_(position) {}
+  Cell() {}
+  Cell(real_v diameter) : diameter_{diameter} { UpdateVolume(); }
+  Cell(const std::array<real_v, 3>& position)
+      : position_(position), mass_location_(position) {}
 
   virtual ~Cell() {}
 
@@ -35,24 +34,18 @@ class Cell {
 
   Vc_ALWAYS_INLINE bool is_full() const { return size_ == Backend::kVecLen; }
 
-  Vc_ALWAYS_INLINE size_t Size() const {
-    return size_;
-  }
+  Vc_ALWAYS_INLINE size_t Size() const { return size_; }
 
-  Vc_ALWAYS_INLINE void SetUninitialized() {
-    size_ = 0;
-  }
+  Vc_ALWAYS_INLINE void SetUninitialized() { size_ = 0; }
 
-  Vc_ALWAYS_INLINE void SetSize(std::size_t size) {
-    size_ = size;
-  }
+  Vc_ALWAYS_INLINE void SetSize(std::size_t size) { size_ = size; }
 
   Vc_ALWAYS_INLINE void Set(std::size_t index, const Cell<ScalarBackend>& cell);
 
   Vc_ALWAYS_INLINE Cell<ScalarBackend> Get(std::size_t index) const;
 
   Vc_ALWAYS_INLINE void CopyTo(std::size_t from_idx, std::size_t to_idx,
-                                Cell<VcBackend>* dest) const;
+                               Cell<VcBackend>* dest) const;
 
   // remaining functions
   Vc_ALWAYS_INLINE const real_v& GetAdherence() const { return adherence_; }
@@ -61,10 +54,12 @@ class Cell {
 
   Vc_ALWAYS_INLINE const real_v& GetMass() const { return mass_; }
 
-  Vc_ALWAYS_INLINE const std::array<real_v, 3>& GetMassLocation () const { return mass_location_; }
+  Vc_ALWAYS_INLINE const std::array<real_v, 3>& GetMassLocation() const {
+    return mass_location_;
+  }
 
   Vc_ALWAYS_INLINE std::array<aosoa<Cell, Backend>, Backend::kVecLen>
-  GetNeighbors(const daosoa<Cell, Backend >& all_cells) const {
+  GetNeighbors(const daosoa<Cell, Backend>& all_cells) const {
     std::array<aosoa<Cell, Backend>, Backend::kVecLen> ret;
     const size_t size = size_;
     for (size_t i = 0; i < size; i++) {
@@ -73,11 +68,14 @@ class Cell {
     return ret;
   }
 
-  Vc_ALWAYS_INLINE const std::array<array<int, 8>, Backend::kVecLen> GetNeighbors() const {
+  Vc_ALWAYS_INLINE const std::array<array<int, 8>, Backend::kVecLen>
+  GetNeighbors() const {
     return neighbors_;
   }
 
-  Vc_ALWAYS_INLINE const std::array<real_v, 3>& GetPosition() const { return position_; }
+  Vc_ALWAYS_INLINE const std::array<real_v, 3>& GetPosition() const {
+    return position_;
+  }
 
   Vc_ALWAYS_INLINE const std::array<real_v, 3>& GetTractorForce() const {
     return tractor_force_;
@@ -85,12 +83,24 @@ class Cell {
 
   Vc_ALWAYS_INLINE const real_v& GetVolume() const { return volume_; }
 
-  Vc_ALWAYS_INLINE void SetAdherence(const real_v& adherence) { adherence_ = adherence; }
-  Vc_ALWAYS_INLINE void SetDiameter(const real_v& diameter) { diameter_ = diameter; }
+  Vc_ALWAYS_INLINE void SetAdherence(const real_v& adherence) {
+    adherence_ = adherence;
+  }
+  Vc_ALWAYS_INLINE void SetDiameter(const real_v& diameter) {
+    diameter_ = diameter;
+  }
   Vc_ALWAYS_INLINE void SetMass(const real_v& mass) { mass_ = mass; }
-  Vc_ALWAYS_INLINE void SetMassLocation(const std::array<real_v, 3>& mass_location) { mass_location_ = mass_location; }
-  Vc_ALWAYS_INLINE void SetPosition(const std::array<real_v, 3>& position) { position_ = position; }
-  Vc_ALWAYS_INLINE void SetTractorForce(const std::array<real_v, 3>& tractor_force) { tractor_force_ = tractor_force; }
+  Vc_ALWAYS_INLINE void SetMassLocation(
+      const std::array<real_v, 3>& mass_location) {
+    mass_location_ = mass_location;
+  }
+  Vc_ALWAYS_INLINE void SetPosition(const std::array<real_v, 3>& position) {
+    position_ = position;
+  }
+  Vc_ALWAYS_INLINE void SetTractorForce(
+      const std::array<real_v, 3>& tractor_force) {
+    tractor_force_ = tractor_force;
+  }
   Vc_ALWAYS_INLINE void SetNeighbors(
       const std::array<array<int, 8>, Backend::kVecLen>& neighbors) {
     neighbors_ = neighbors;
@@ -101,7 +111,8 @@ class Cell {
     // scaling for integration step
     real_v dV = speed * real_t(Param::kSimulationTimeStep);
     volume_ += dV;
-    volume_ = Vc::iif(volume_ < real_t(5.2359877E-7), real_v(5.2359877E-7), volume_);
+    volume_ =
+        Vc::iif(volume_ < real_t(5.2359877E-7), real_v(5.2359877E-7), volume_);
     UpdateDiameter();
     //    scheduleMeAndAllMyFriends();
   }
@@ -117,23 +128,21 @@ class Cell {
     volume_ = real_t(Math::kPi) / 6 * diameter_ * diameter_ * diameter_;
   }
 
-
   Vc_ALWAYS_INLINE void UpdateMassLocation(const std::array<real_v, 3>& delta) {
     mass_location_[0] += delta[0];
     mass_location_[1] += delta[1];
     mass_location_[2] += delta[2];
   }
 
-  Vc_ALWAYS_INLINE void GetForceOn(const std::array<real_v, 3>& ref_mass_location,
-                                   const real_v& ref_diameter,
-                                   std::array<real_v, 3>* force) const {
+  Vc_ALWAYS_INLINE void GetForceOn(
+      const std::array<real_v, 3>& ref_mass_location,
+      const real_v& ref_diameter, std::array<real_v, 3>* force) const {
     DefaultForce<Backend> default_force;  // todo inefficient -> make member
     real_v iof_coefficient(Param::kSphereDefaultInterObjectCoefficient);
 
-    default_force.forceBetweenSpheres(
-        ref_mass_location, ref_diameter,
-        iof_coefficient, mass_location_, diameter_,
-        iof_coefficient, force);
+    default_force.forceBetweenSpheres(ref_mass_location, ref_diameter,
+                                      iof_coefficient, mass_location_,
+                                      diameter_, iof_coefficient, force);
   }
 
  private:
@@ -211,10 +220,10 @@ inline void Cell<VcBackend>::Set(std::size_t index,
   mass_[index] = cell.mass_[0];
 }
 
-//todo only for vector backend
+// todo only for vector backend
 template <typename Backend>
 inline void Cell<Backend>::CopyTo(std::size_t src_idx, std::size_t dest_idx,
-                             Cell<VcBackend>* dest) const {
+                                  Cell<VcBackend>* dest) const {
   dest->position_[0][dest_idx] = position_[0][src_idx];
   dest->position_[1][dest_idx] = position_[1][src_idx];
   dest->position_[2][dest_idx] = position_[2][src_idx];

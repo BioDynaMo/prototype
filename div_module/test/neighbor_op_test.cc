@@ -5,12 +5,15 @@
 
 namespace bdm {
 
-TEST (NeighborOpTest, Compute) {
+TEST(NeighborOpTest, Compute) {
   daosoa<Cell, VcBackend> cells;
   // fixme ugly
-  cells.push_back(Cell<ScalarBackend>(std::array<ScalarBackend::real_v, 3>{0, 0, 0}));
-  cells.push_back(Cell<ScalarBackend>(std::array<ScalarBackend::real_v, 3>{30, 30, 30}));
-  cells.push_back(Cell<ScalarBackend>(std::array<ScalarBackend::real_v, 3>{60, 60, 60}));
+  cells.push_back(
+      Cell<ScalarBackend>(std::array<ScalarBackend::real_v, 3>{0, 0, 0}));
+  cells.push_back(
+      Cell<ScalarBackend>(std::array<ScalarBackend::real_v, 3>{30, 30, 30}));
+  cells.push_back(
+      Cell<ScalarBackend>(std::array<ScalarBackend::real_v, 3>{60, 60, 60}));
 
   // execute operation
   NeighborOp op;

@@ -27,8 +27,8 @@ TEST(DefaultForce, General) {
 
   DefaultForce<VcBackend> force;
   force.forceBetweenSpheres(ref_mass_location, ref_diameter,
-                            ref_iof_coefficient, nb_mass_location,
-                            nb_diameter, nb_iof_coefficient, &result);
+                            ref_iof_coefficient, nb_mass_location, nb_diameter,
+                            nb_iof_coefficient, &result);
 
   // x component
   EXPECT_NEAR(result[0][0], 7.1429184067241138, abs_error<real_t>::value);
@@ -59,9 +59,8 @@ TEST(DefaultForce, AllNonOverlapping) {
 
   DefaultForce<VcBackend> force;
   force.forceBetweenSpheres(ref_mass_location, ref_diameter,
-                            ref_iof_coefficient, nb_mass_location,
-                            nb_diameter, nb_iof_coefficient, &result);
-
+                            ref_iof_coefficient, nb_mass_location, nb_diameter,
+                            nb_iof_coefficient, &result);
 
   // x component
   EXPECT_NEAR(result[0].sum(), 0, abs_error<real_t>::value);
@@ -92,8 +91,8 @@ TEST(DefaultForce, OneNonOverlapping) {
 
   DefaultForce<VcBackend> force;
   force.forceBetweenSpheres(ref_mass_location, ref_diameter,
-      ref_iof_coefficient, nb_mass_location,
-      nb_diameter, nb_iof_coefficient, &result);
+                            ref_iof_coefficient, nb_mass_location, nb_diameter,
+                            nb_iof_coefficient, &result);
 
   // x component
   EXPECT_NEAR(result[0][0], 0, abs_error<real_t>::value);
@@ -120,8 +119,8 @@ TEST(DefaultForce, AllAtSamePosition) {
 
   DefaultForce<VcBackend> force;
   force.forceBetweenSpheres(ref_mass_location, ref_diameter,
-      ref_iof_coefficient, nb_mass_location,
-      nb_diameter, nb_iof_coefficient, &result);
+                            ref_iof_coefficient, nb_mass_location, nb_diameter,
+                            nb_iof_coefficient, &result);
 
   // random number must be in interval [-3.0, 3.0]
   // x component

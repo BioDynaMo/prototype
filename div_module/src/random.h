@@ -6,10 +6,11 @@
 
 namespace bdm {
 
-///C++ implementation of the Java default random number generator (java.util.Random)
+/// C++ implementation of the Java default random number generator
+/// (java.util.Random)
 class Random {
  public:
-  Random() {};
+  Random(){};
 
   void setSeed(long seed);
 
@@ -22,9 +23,10 @@ class Random {
   std::array<double, 3> nextNoise(double k);
 
   template <typename Backend>
-  std::array<typename Backend::real_v, 3> NextNoise(const typename Backend::real_v& k) {
+  std::array<typename Backend::real_v, 3> NextNoise(
+      const typename Backend::real_v& k) {
     std::array<typename Backend::real_v, 3> ret;
-    for ( size_t i = 0; i < Backend::kVecLen; i++ ) {
+    for (size_t i = 0; i < Backend::kVecLen; i++) {
       // todo not most cache friendly way
       ret[0][i] = -k[i] + 2 * k[i] * nextDouble();
       ret[1][i] = -k[i] + 2 * k[i] * nextDouble();
@@ -47,4 +49,4 @@ class Random {
 
 }  // namespace bdm
 
-#endif  //RANDOM_H_
+#endif  // RANDOM_H_

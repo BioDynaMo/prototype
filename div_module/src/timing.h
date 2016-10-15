@@ -20,7 +20,7 @@ class Timing {
 
   ~Timing() {
     long duration = (timestamp() - start_);
-    if(aggregator_ == nullptr) {
+    if (aggregator_ == nullptr) {
       std::cout << text_ << " " << duration << " ms" << std::endl;
     } else {
       aggregator_->AddEntry(text_, duration);
@@ -39,7 +39,7 @@ class Timing {
  private:
   long start_;
   std::string text_;
-  TimingAggregator *aggregator_ = nullptr;
+  TimingAggregator* aggregator_ = nullptr;
 };
 
 }  // namespace bdm

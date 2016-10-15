@@ -27,12 +27,13 @@ class DefaultForce {
                            const real_v& nb_iof_coefficient,
                            std::array<real_v, 3>* result) {
     const auto& c1 = ref_mass_location;
-    real_v r1  = 0.5f * ref_diameter;
+    real_v r1 = 0.5f * ref_diameter;
     const auto& c2 = nb_mass_location;
     real_v r2 = 0.5f * nb_diameter;
     // We take virtual bigger radii to have a distant interaction, to get a
     // desired density.
-    real_v additional_radius = 10.0f * Vc::min(ref_iof_coefficient, nb_iof_coefficient);
+    real_v additional_radius =
+        10.0f * Vc::min(ref_iof_coefficient, nb_iof_coefficient);
     r1 += additional_radius;
     r2 += additional_radius;
     // the 3 components of the vector c2 -> c1
@@ -52,9 +53,8 @@ class DefaultForce {
     }
     // to avoid a division by 0 if the centers are (almost) at the same
     // location
-    // fixme performance - generates a lot of random numbers which I think are hardly
-    // ever used P(distance_between_centers < 0.00000001) very small
-    auto distance_lt_min = distance_between_centers < real_v(0.00000001);   // fixme should be param or constant
+    // fixme no magic number -> move to param
+    auto distance_lt_min = distance_between_centers < real_v(0.00000001);
     if (distance_lt_min.isFull()) {
       *result = random_.NextNoise<VcBackend>(VcBackend::real_v(3.0));
       return;
@@ -67,14 +67,13 @@ class DefaultForce {
     real_v F = k * delta - gamma * Vc::sqrt(R * delta);
 
     real_v module = F / distance_between_centers;
-    (*result) =
-        {module * comp1, module * comp2, module * comp3};
+    (*result) = {module * comp1, module * comp2, module * comp3};
 
-    if(!delta_lt_0.isEmpty()) {
+    if (!delta_lt_0.isEmpty()) {
       (*result)[0].setZero(delta_lt_0);
       (*result)[1].setZero(delta_lt_0);
       (*result)[2].setZero(delta_lt_0);
-    } else if(!distance_lt_min.isEmpty()) {
+    } else if (!distance_lt_min.isEmpty()) {
       auto random_force = random_.NextNoise<VcBackend>(VcBackend::real_v(3.0));
       (*result)[0] = Vc::iif(distance_lt_min, random_force[0], (*result)[0]);
       (*result)[1] = Vc::iif(distance_lt_min, random_force[1], (*result)[1]);

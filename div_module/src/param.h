@@ -5,7 +5,6 @@ namespace bdm {
 
 class Param {
  public:
-
   /** Time between two simulation step, in hours. */
   static constexpr double kSimulationTimeStep = 0.01;
   /** Maximum jump that a point mass can do in one time step. Useful to

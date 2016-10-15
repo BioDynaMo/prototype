@@ -8,7 +8,7 @@
 
 namespace bdm {
 
-template <template <typename> class T, typename Backend=VcBackend>
+template <template <typename> class T, typename Backend = VcBackend>
 class daosoa {
  public:
   // soa of type T
@@ -18,12 +18,11 @@ class daosoa {
 
   daosoa() {}
   daosoa(size_t scalar_elements) {
-    data_.reserve(scalar_elements / Backend::kVecLen + (scalar_elements % Backend::kVecLen ? 1 : 0));
+    data_.reserve(scalar_elements / Backend::kVecLen +
+                  (scalar_elements % Backend::kVecLen ? 1 : 0));
   }
 
-  explicit daosoa(const value_type& cell) {
-    data_.push_back(cell);
-  }
+  explicit daosoa(const value_type& cell) { data_.push_back(cell); }
 
   /// \brief returns the number of SOA elements in this container
   size_t vectors() const { return data_.size(); }
@@ -31,8 +30,9 @@ class daosoa {
   /// this function assumes that only the last vector may not be fully
   /// initialized
   size_t elements() const {
-    if(vectors() != 0) {
-      return (vectors() - 1) * Backend::kVecLen + data_[vectors() - 1].Size(); // fixme Size vectors
+    if (vectors() != 0) {
+      return (vectors() - 1) * Backend::kVecLen +
+             data_[vectors() - 1].Size();  // fixme Size vectors
     } else {
       return 0;
     }
@@ -57,8 +57,9 @@ class daosoa {
                           !std::is_same<value_type, T1>::value>::type
   push_back(const T1& value) {
     // this implementation is only allowed if T != T1 && T1 == ScalarBackend
-    static_assert(is_scalar<T1>::value && !std::is_same<value_type, T1>::value,
-                  "push_back of a non scalar type on a scalar type is not supported");
+    static_assert(
+        is_scalar<T1>::value && !std::is_same<value_type, T1>::value,
+        "push_back of a non scalar type on a scalar type is not supported");
     if (data_.size() == 0) {
       value_type v;
       v.SetUninitialized();
@@ -76,12 +77,13 @@ class daosoa {
 
   void Gather(const bdm::array<int, 8>& indexes, aosoa<T, Backend>* ret) const {
     const size_t scalars = indexes.size();
-    std::size_t n_vectors = scalars / Backend::kVecLen + (scalars % Backend::kVecLen ? 1 : 0);
+    std::size_t n_vectors =
+        scalars / Backend::kVecLen + (scalars % Backend::kVecLen ? 1 : 0);
     std::size_t remaining = scalars % Backend::kVecLen;
 
     ret->SetSize(n_vectors);
     for (std::size_t i = 0; i < n_vectors; i++) {
-      if ( i != n_vectors - 1 || remaining == 0) {
+      if (i != n_vectors - 1 || remaining == 0) {
         (*ret)[i].SetSize(Backend::kVecLen);
       } else {
         (*ret)[i].SetSize(remaining);
@@ -90,7 +92,7 @@ class daosoa {
 
     size_t counter = 0;
     value_type* dest = nullptr;
-    for(size_t i = 0; i < scalars; i++) {
+    for (size_t i = 0; i < scalars; i++) {
       int idx = indexes[i];
       size_t vector_idx = idx / Backend::kVecLen;
       size_t vec_el_idx = idx % Backend::kVecLen;
@@ -118,9 +120,12 @@ class daosoa {
     return data_[vector_idx].Set(vec_el_idx, value);
   }
 
-
-  Vc_ALWAYS_INLINE value_type& operator[](std::size_t index) { return data_[index]; }
-  Vc_ALWAYS_INLINE const value_type& operator[](std::size_t index) const { return data_[index]; }
+  Vc_ALWAYS_INLINE value_type& operator[](std::size_t index) {
+    return data_[index];
+  }
+  Vc_ALWAYS_INLINE const value_type& operator[](std::size_t index) const {
+    return data_[index];
+  }
 
   iterator begin() { return data_.begin(); }
   iterator end() { return data_.end(); }

@@ -4,7 +4,7 @@
 
 namespace bdm {
 
-TEST (ScalarVectorTest, All) {
+TEST(ScalarVectorTest, All) {
   Vc::SimdArray<double, 1> scalar(3.14);
   EXPECT_DOUBLE_EQ(scalar[0], 3.14);
   auto sum = scalar + scalar;
