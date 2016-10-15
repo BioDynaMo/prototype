@@ -39,14 +39,13 @@ if (coverage)
   set(CMAKE_BUILD_TYPE "Debug")
   set(GCC_COMPILE_FLAGS "-Wall -Wno-missing-braces -g -O0 -fopenmp -fprofile-arcs -ftest-coverage")
 else()
-  set(GCC_COMPILE_FLAGS "-Wall -Wno-missing-braces -O3 -fopenmp -ldl -mavx2")
+  set(GCC_COMPILE_FLAGS "-Wall -Wno-missing-braces -fopenmp -ldl")
 endif()
 set(GCC_LINK_FLAGS    "")
 # append
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${GCC_COMPILE_FLAGS}")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${GCC_COMPILE_FLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${GCC_LINK_FLAGS}")
-
 # special clang flag
 if(${CMAKE_CXX_COMPILER_ID} MATCHES Clang)
   # silence unsupported -pthread argument at link time
