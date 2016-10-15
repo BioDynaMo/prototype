@@ -1,5 +1,5 @@
-#ifndef PHYSICS_INTER_OBJECT_FORCE_H_
-#define PHYSICS_INTER_OBJECT_FORCE_H_
+#ifndef DEFAULT_FORCE_H_
+#define DEFAULT_FORCE_H_
 
 #include <cmath>
 #include <Vc/Vc>
@@ -88,4 +88,4 @@ class DefaultForce {
 
 }  // namespace bdm
 
-#endif  // PHYSICS_INTER_OBJECT_FORCE_H_
+#endif  // DEFAULT_FORCE_H_

@@ -6,9 +6,7 @@
 
 namespace bdm {
 
-/**
- * C++ implementation of the Java default random number generator (java.util.Random)
- */
+///C++ implementation of the Java default random number generator (java.util.Random)
 class Random {
  public:
   Random() {};

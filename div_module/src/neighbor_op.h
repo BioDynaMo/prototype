@@ -14,8 +14,6 @@ using nanoflann::KDTreeSingleIndexAdaptor;
 // And this is the "dataset to kd-tree" adaptor class:
 template <typename Derived>
 struct NanoFlannDaosoaAdapter {
-  //  typedef typename Derived::coord_t coord_t;
-//  typedef double coord_t;
   using coord_t = VcBackend::real_t;
 
   const Derived& obj;  //!< A const ref to the data set origin
@@ -89,7 +87,7 @@ class NeighborOp {
 
     // calc neighbors
     //std::cout << "number of elements " << cells->elements() << std::endl;
-#pragma omp parallel for
+    #pragma omp parallel for
     for (size_t i = 0; i < cells->elements(); i++) {
       const auto vector_idx = i / VcBackend::kVecLen;
       const auto scalar_idx = i % VcBackend::kVecLen;
@@ -108,14 +106,12 @@ class NeighborOp {
       const auto& position = cell.GetPosition();
       const VcBackend::real_t query_pt[3] = {position[0][0], position[1][0],
                                   position[2][0]};
-//      std::cout << "  qp: " << query_pt[0] << " - " << query_pt[1] << " - " << query_pt[2] << " - " << std::endl;
 
       // calculate neighbors
       const size_t n_matches =
           index.radiusSearch(&query_pt[0], search_radius, ret_matches, params);
 
       // transform result (change data structure - remove self from list)
-//      std::cout << "n_matches: " << n_matches << std::endl;
       bdm::array<int, 8>   i_neighbors;
       i_neighbors.SetSize(n_matches - 1);
       size_t counter = 0;
@@ -128,7 +124,7 @@ class NeighborOp {
     }
 
     // update neighbors
-#pragma omp parallel for
+    #pragma omp parallel for
     for (size_t i = 0; i < cells->vectors(); i++) {
       (*cells)[i].SetNeighbors(neighbors[i]);
     }

@@ -22,11 +22,12 @@ TEST (DisplacementOpTest, Compute) {
       real_v((const real_t[]){0, 0})
   };
 
-  std::array<real_v, 3> tractor_force = {
-      real_v((const real_t[]){0.99, 1.01}),
-      real_v((const real_t[]){0.98, 1.02}),
-      real_v((const real_t[]){0.97, 1.03})
-  };
+  // todo generate target values with this tf
+  // std::array<real_v, 3> tractor_force = {
+  //     real_v((const real_t[]){0.99, 1.01}),
+  //     real_v((const real_t[]){0.98, 1.02}),
+  //     real_v((const real_t[]){0.97, 1.03})
+  // };
 
   bdm::array<int, 8> neighbor_1;
   neighbor_1[0] = 1;
@@ -40,7 +41,7 @@ TEST (DisplacementOpTest, Compute) {
   cell.SetDiameter(diameter);
   cell.SetPosition(position);
   cell.SetMassLocation(position);
-//  cell.SetTractorForce(tractor_force);
+  // cell.SetTractorForce(tractor_force);
   cell.SetAdherence(adherence);
   cell.SetMass(mass);
   cell.SetNeighbors(neighbors);

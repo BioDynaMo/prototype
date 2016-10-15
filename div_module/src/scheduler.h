@@ -26,11 +26,7 @@ class Scheduler {
       physics.Compute(&cells);
       // todo transfrom cells based on opdefinition
       biology.Compute(&cells);
-//      if(n) {
-//        n = false;
-        neighbor.Compute(&cells);
-//      }
-      // update cells in ResourceManager
+      neighbor.Compute(&cells);
       rm->SetCells(cells);
     }
   }

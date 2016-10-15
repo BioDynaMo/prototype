@@ -63,24 +63,12 @@ class Cell {
 
   Vc_ALWAYS_INLINE const std::array<real_v, 3>& GetMassLocation () const { return mass_location_; }
 
-//  Vc_ALWAYS_INLINE std::array<daosoa<Cell, Backend >, Backend::kVecLen>
-//  GetNeighbors(const daosoa<Cell, Backend >& all_cells) const {
-//    std::array<daosoa<Cell, Backend>, Backend::kVecLen> ret;
-//    const size_t size = size_;
-//    for (size_t i = 0; i < size; i++) {
-//      daosoa<Cell, Backend> neighbors;
-//      all_cells.Gather(neighbors_[i], &neighbors);
-//      ret[i] = std::move(neighbors);
-//    }
-//    return ret;
-//  }
-
   Vc_ALWAYS_INLINE std::array<aosoa<Cell, Backend>, Backend::kVecLen>
-  GetNeighbors1(const daosoa<Cell, Backend >& all_cells) const {
+  GetNeighbors(const daosoa<Cell, Backend >& all_cells) const {
     std::array<aosoa<Cell, Backend>, Backend::kVecLen> ret;
     const size_t size = size_;
     for (size_t i = 0; i < size; i++) {
-      all_cells.Gather1(neighbors_[i], &(ret[i]));
+      all_cells.Gather(neighbors_[i], &(ret[i]));
     }
     return ret;
   }
@@ -140,9 +128,6 @@ class Cell {
                                    const real_v& ref_diameter,
                                    std::array<real_v, 3>* force) const {
     DefaultForce<Backend> default_force;  // todo inefficient -> make member
-//    std::array<double, 3> ref_mass_location = {reference.mass_location_[0][0],
-//                                               reference.mass_location_[1][0],
-//                                               reference.mass_location_[2][0]};
     real_v iof_coefficient(Param::kSphereDefaultInterObjectCoefficient);
 
     default_force.forceBetweenSpheres(
@@ -150,25 +135,6 @@ class Cell {
         iof_coefficient, mass_location_, diameter_,
         iof_coefficient, force);
   }
-
-  //  Vc_ALWAYS_INLINE
-  //  void scheduleMeAndAllMyFriends() {
-  //
-  //    // Re-schedule me and every one that has something to do with me :
-  //    setOnTheSchedulerListForPhysicalObjects(true);
-  //    // removed loop for daughters
-  //    // neighbors :
-  //    for (auto neighbor : so_node_->getNeighbors()) {
-  //      if (neighbor->isAPhysicalObject()) {
-  //        static_cast<PhysicalObject*>(neighbor)->setOnTheSchedulerListForPhysicalObjects(true);
-  //      }
-  //    }
-  //    // removed loop for bonds
-  //  }
-  //
-  //  void RunPhysics(size_t i, bool value) {
-  //    // fixme implement
-  //  }
 
  private:
   std::size_t size_ = Backend::kVecLen;
@@ -180,7 +146,6 @@ class Cell {
   std::array<real_v, 3> tractor_force_;
   real_v adherence_;
   real_v mass_;
-  //  bool_v run_physics_;
   // stores a list of neighbor ids for each scalar cell
   std::array<bdm::array<int, 8>, Backend::kVecLen> neighbors_;
 };
@@ -194,17 +159,7 @@ void Cell<Backend>::Append(const Cell<ScalarBackend>& cell) {
   Set(size_++, cell);
 }
 
-//template <typename Backend>
-//void Cell<Backend>::Get(std::size_t index, Cell<ScalarBackend>* cell) {
-//  // todo better error message
-//  throw std::runtime_error("should never be called");
-//}
-
-//template <>
-//inline Cell<ScalarBackend> Cell<VcBackend>::Get(std::size_t index) const {
-//  // todo error if index != 0
-//  cell = this;
-//}
+// todo get for vector backend
 
 // fixme enable only if Backend != ScalarBackend
 template <typename Backend>
@@ -236,12 +191,6 @@ void Cell<Backend>::Set(std::size_t index, const Cell<ScalarBackend>& cell) {
   // todo better error message
   throw std::runtime_error("should never be called");
 }
-
-// template <>
-// void Cell<ScalarBackend>::Set(std::size_t index, const Cell<ScalarBackend>&
-// cell) {
-//  this = cell;
-//}
 
 template <>
 inline void Cell<VcBackend>::Set(std::size_t index,

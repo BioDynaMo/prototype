@@ -113,25 +113,7 @@ TEST (daosoaTest, ReserveElementsSetScalar) {
   }
 }
 
-//TEST (daosoaTest, Gather) {
-//  daosoa<Object> objects;
-//
-//  // create objects
-//  for (size_t i = 0; i < 10; i++) {
-//    objects.push_back(Object<ScalarBackend>(i));
-//  }
-//
-//  daosoa<Object> gathered(4);
-//  std::vector<int> indexes = {5, 3, 9, 2};
-//  objects.Gather(indexes, &gathered);
-//
-//  // check if it returns the correct objects
-//  for (size_t i = 0; i < indexes.size(); i++) {
-//    EXPECT_EQ(indexes[i], gathered.GetScalar(i).GetId()[0]);
-//  }
-//}
-
-TEST (daosoaTest, Gather1) {
+TEST (daosoaTest, Gather) {
   daosoa<Object> objects;
 
   // create objects
@@ -146,7 +128,7 @@ TEST (daosoaTest, Gather1) {
   indexes[2] = 9;
   indexes[3] = 2;
   indexes.SetSize(4);
-  objects.Gather1(indexes, &gathered);
+  objects.Gather(indexes, &gathered);
   // check if it returns the correct objects
   size_t target_n_vectors = 4 / VcBackend::kVecLen + (4 % VcBackend::kVecLen ? 1 : 0);
   EXPECT_EQ(target_n_vectors, gathered.vectors());

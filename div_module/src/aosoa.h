@@ -1,8 +1,8 @@
 #ifndef AOSOA_H_
 #define AOSOA_H_
 
-#include <vector>
 #include <type_traits>
+#include <vector>
 #include "backend.h"
 
 namespace bdm {
@@ -26,7 +26,6 @@ class aosoa {
   /// \brief returns the number of SOA elements in this container
   size_t vectors() const { return size_; }
 
-
   Vc_ALWAYS_INLINE value_type& operator[](std::size_t index) { return data_[index]; }
   Vc_ALWAYS_INLINE const value_type& operator[](std::size_t index) const { return data_[index]; }
 
@@ -35,7 +34,6 @@ class aosoa {
 
   const_iterator begin() const { return data_.cbegin(); }
   const_iterator end() const { return data_.cend(); }
-
 
  private:
   size_t size_ = 0;

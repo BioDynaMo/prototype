@@ -3,7 +3,7 @@
 
 #include <Vc/Vc>
 
-//namespace bdm {
+namespace bdm {
 
 struct VcBackend {
   typedef Vc::int_v int_v;
@@ -11,19 +11,6 @@ struct VcBackend {
   typedef Vc::double_v::value_type real_t;
   static const size_t kVecLen = real_v::Size;
   typedef Vc::double_v::Mask bool_v;
-  //  typedef Vc::Vector<Precision> precision_v;
-  //  typedef Vc::Vector<Precision>::Mask bool_v;
-  //  typedef Vc::Vector<int> inside_v;
-  //  constexpr static bool early_returns = false;
-  //  const static precision_v kOne;
-  //  const static precision_v kZero;
-  //  const static bool_v kTrue;
-  //  const static bool_v kFalse;
-  //  // alternative typedefs ( might supercede above typedefs )
-  //  typedef Vc::int_v Int_t;
-  //  typedef Vc::Vector<Precision> double_t;
-  //  typedef Vc::Vector<Precision>::Mask Bool_t;
-  //  typedef Vc::Vector<Precision> Index_t;
 };
 
 struct ScalarBackend {
@@ -46,6 +33,6 @@ struct is_scalar<Container<ScalarBackend> > {
   static const bool value = true;
 };
 
-//} // namespace bdm
+} // namespace bdm
 
 #endif  // BACKEND_H_

@@ -1,8 +1,8 @@
 #ifndef ARRAY_H_
 #define ARRAY_H_
 
-#include <vector>
 #include <type_traits>
+#include <vector>
 #include "backend.h"
 
 namespace bdm {
@@ -20,7 +20,6 @@ class array {
 
   /// \brief returns the number of SOA elements in this container
   size_t size() const { return size_; }
-
 
   Vc_ALWAYS_INLINE T& operator[](std::size_t index) { return data_[index]; }
   Vc_ALWAYS_INLINE const T& operator[](std::size_t index) const { return data_[index]; }

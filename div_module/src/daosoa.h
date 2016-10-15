@@ -8,7 +8,6 @@
 
 namespace bdm {
 
-//, template<typename Element> class Container = std::vector>
 template <template <typename> class T, typename Backend=VcBackend>
 class daosoa {
  public:
@@ -25,11 +24,6 @@ class daosoa {
   explicit daosoa(const value_type& cell) {
     data_.push_back(cell);
   }
-
-//  size_t elements() const {
-//    auto s = vectors();
-//    return (s - 1) * VecLength + data_[s - 1].vectors();
-//  }
 
   /// \brief returns the number of SOA elements in this container
   size_t vectors() const { return data_.size(); }
@@ -80,48 +74,7 @@ class daosoa {
     last->Append(value);
   }
 
-//  void Gather(const std::vector<int>& indexes, daosoa<T, Backend>* ret) const {
-////    for (int idx : indexes) {
-////      const auto& scalar_element = GetScalar(idx);
-////      ret->push_back(scalar_element);
-////    }
-//    size_t scalars = indexes.size();
-//    std::size_t n_vectors = scalars / Backend::kVecLen + (scalars % Backend::kVecLen ? 1 : 0);
-//    std::size_t remaining = scalars % Backend::kVecLen;
-////    for (std::size_t i = 0; i < n_vectors; i++) {
-////      value_type v;
-////      if ( i != n_vectors - 1 || remaining == 0) {
-////        v.SetSize(Backend::kVecLen);
-////      } else {
-////        v.SetSize(remaining);
-////      }
-////      ret->push_back(std::move(v));
-////    }
-//    ret->data_.resize(n_vectors);
-//    for (std::size_t i = 0; i < n_vectors; i++) {
-//      if ( i != n_vectors - 1 || remaining == 0) {
-//        (*ret)[i].SetSize(Backend::kVecLen);
-//      } else {
-//        (*ret)[i].SetSize(remaining);
-//      }
-//    }
-//
-//    size_t counter = 0;
-//    value_type* dest = nullptr;
-//    for(int idx : indexes) {
-//      size_t vector_idx = idx / Backend::kVecLen;
-//      size_t vec_el_idx = idx % Backend::kVecLen;
-//      size_t dest_idx = counter % Backend::kVecLen;
-//      if (dest_idx == 0) {
-//        dest = &((*ret)[counter / Backend::kVecLen]);
-//      }
-//      data_[vector_idx].CopyTo(vec_el_idx, dest_idx, dest);
-//      counter++;
-//    }
-//  }
-
-
-  void Gather1(const bdm::array<int, 8>& indexes, aosoa<T, Backend>* ret) const {
+  void Gather(const bdm::array<int, 8>& indexes, aosoa<T, Backend>* ret) const {
     const size_t scalars = indexes.size();
     std::size_t n_vectors = scalars / Backend::kVecLen + (scalars % Backend::kVecLen ? 1 : 0);
     std::size_t remaining = scalars % Backend::kVecLen;
@@ -174,10 +127,6 @@ class daosoa {
 
   const_iterator begin() const { return data_.cbegin(); }
   const_iterator end() const { return data_.cend(); }
-
-//  void merge() {
-//    // todo implement
-//  }
 
  private:
   std::vector<value_type, Vc::Allocator<value_type> > data_;

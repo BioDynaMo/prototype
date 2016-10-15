@@ -107,7 +107,6 @@ TEST(DefaultForce, OneNonOverlapping) {
 /// are at the same position -> should return random force
 TEST(DefaultForce, AllAtSamePosition) {
   using real_v = VcBackend::real_v;
-  using real_t = real_v::value_type;
   std::array<real_v, 3> ref_mass_location = {0, 0, 0};
   real_v ref_diameter = 8;
   real_v ref_iof_coefficient = 0.15;

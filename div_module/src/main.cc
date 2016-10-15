@@ -4,6 +4,7 @@
 
 #include <omp.h>
 
+#include "backend.h"
 #include "cell.h"
 #include "daosoa.h"
 #include "resource_manager.h"
@@ -17,9 +18,10 @@ using bdm::Cell;
 using bdm::daosoa;
 using bdm::ResourceManager;
 using bdm::Scheduler;
+using bdm::ScalarBackend;
 using bdm::Timing;
 using bdm::TimingAggregator;
-
+using bdm::VcBackend;
 
 void execute(size_t cells_per_dim, size_t iterations, TimingAggregator* statistic) {
   const unsigned space = 20;
