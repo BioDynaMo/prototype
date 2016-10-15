@@ -22,8 +22,13 @@ class TimingAggregator {
     }
   }
 
+  void AddDescription(const std::string text) {
+    descriptions_.push_back(text);
+  }
+
  private:
   std::map<std::string, std::vector<long>> timings_;
+  std::vector<std::string> descriptions_;
 
   friend std::ostream& operator<<(std::ostream &os, const TimingAggregator& p);
 };
@@ -39,12 +44,18 @@ std::ostream & operator<<(std::ostream &os, const TimingAggregator& ta) {
       counter++;
     }
     // print header
+    if(ta.descriptions_.size() != 0) {
+      os << "descriptions, ";
+    }
     for (auto& key : keys) {
       os << key << ", ";
     }
     os << std::endl;
     // print table
     for (size_t i = 0; i < values[0].size(); i++) {
+      if(i < ta.descriptions_.size()) {
+        os << ta.descriptions_[i] << ", ";
+      }
       for (auto& value : values) {
         os << value[i] << ", ";
       }

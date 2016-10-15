@@ -1,5 +1,6 @@
 #include <cmath>
 #include <iostream>
+#include <sstream>
 
 #include <omp.h>
 
@@ -9,10 +10,8 @@
 #include "scheduler.h"
 #include "timing.h"
 #include "timing_aggregator.h"
-#include "displacement_op.h" //fixme remove
-#include "dividing_cell_op.h" //fixme remove
-//#include "vtune_op_wrapper.h" //fixme remove
-#include "ittnotify.h"
+#include "displacement_op.h"
+#include "dividing_cell_op.h"
 
 using bdm::Cell;
 using bdm::daosoa;
@@ -22,22 +21,16 @@ using bdm::Timing;
 using bdm::TimingAggregator;
 
 
-void execute(TimingAggregator* statistic) {
+void execute(size_t cells_per_dim, size_t iterations, TimingAggregator* statistic) {
   const unsigned space = 20;
-  const unsigned n_elements_pe_dim = 128;
 
-  Timing timing;
-  auto start = timing.timestamp();
-  daosoa<Cell> cells(n_elements_pe_dim * n_elements_pe_dim * n_elements_pe_dim);
-  auto stop = timing.timestamp();
-  std::cout << "reserve cells " << (stop - start) << std::endl;
-
+  daosoa<Cell> cells(cells_per_dim * cells_per_dim * cells_per_dim);
   {
     Timing timing("setup", statistic);
-    for (size_t i = 0; i < n_elements_pe_dim; i++) {
-      for (size_t j = 0; j < n_elements_pe_dim; j++) {
-        for (size_t k = 0; k < n_elements_pe_dim; k++) {
-          // todo that's ugly
+    for (size_t i = 0; i < cells_per_dim; i++) {
+      for (size_t j = 0; j < cells_per_dim; j++) {
+        for (size_t k = 0; k < cells_per_dim; k++) {
+          // todo improve syntax
           Cell<ScalarBackend> cell(std::array<ScalarBackend::real_v, 3> { i * space, j * space, k * space });
           cell.SetDiameter(30);
           cell.SetAdherence(0.4);
@@ -51,58 +44,51 @@ void execute(TimingAggregator* statistic) {
 
   {
     Timing timing("neighbor_op", statistic);
-//    bdm::VTuneOpWrapper<bdm::NeighborOp> op(700);
     bdm::NeighborOp op(700);
     op.Compute(&cells);
   }
 
-//  __itt_resume();
-
   {
     Timing timing("div_op", statistic);
-//    bdm::VTuneOpWrapper<bdm::DividingCellOp> biology;
     bdm::DividingCellOp biology;
-    biology.Compute(&cells);
+    for( size_t i = 0; i < iterations; i++) {
+      biology.Compute(&cells);
+    }
   }
-
-  __itt_resume();
 
   {
     Timing timing("displacement op", statistic);
-//    bdm::VTuneOpWrapper<bdm::DisplacementOp> op;
     bdm::DisplacementOp op;
-    op.Compute(&cells);
+    for( size_t i = 0; i < iterations; i++) {
+      op.Compute(&cells);
+    }
+  }
+}
+
+void benchmark(size_t cells_per_dim, size_t iterations, TimingAggregator* statistic) {
+  const int max_threads = omp_get_max_threads();
+  for (int i = 1; i <= max_threads; i *= 2) {
+    std::stringstream ss;
+    ss << i << " thread(s) - " << cells_per_dim << " cells per dim - " << iterations << " iteration(s)";
+    statistic->AddDescription(ss.str());
+    omp_set_num_threads(i);
+    execute(cells_per_dim, iterations, statistic);
   }
 }
 
 int main(int args, char** argv) {
-  ////  Random::setSeed(2L);
-
-  ///  auto c = CellFactory::getCellInstance( { 0.0, 0.0, 0.0 });
-  ///  c->addCellModule(CellModule::UPtr { new DividingModule() });
-
-
+  std::cout << "Cell<VcBackend> size: " << sizeof(Cell<VcBackend>) << std::endl;
 
   TimingAggregator statistic;
   if(args > 1 && std::string(argv[1]) == "--scaling-analysis") {
-    const int max_threads = omp_get_max_threads();
-    for (int i = 1; i <= max_threads; i *= 2) {
-      std::cout << "run with " << i << " threads" << std::endl;
-      omp_set_num_threads(i);
-      execute(&statistic);
-    }
+    benchmark(4, 1e5, &statistic);
+  } else if(args > 1 && std::string(argv[1]) == "--full-analysis") {
+    benchmark(4, 1e5, &statistic);
+    benchmark(128, 1, &statistic);
   } else {
     omp_set_num_threads(1);
-    execute(&statistic);
+    execute(4, 1e5, &statistic);
   }
   std::cout << statistic << std::endl;
-
-//  ResourceManager<VcBackend>::Get()->SetCells(cells);
-//
-//  Scheduler scheduler;
-//  {
-//    Timing timing("simulation");
-//    scheduler.Simulate<VcBackend>(2);
-//  }
   return 0;
 }
