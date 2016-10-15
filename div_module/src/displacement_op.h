@@ -25,7 +25,7 @@ class DisplacementOp {
   template <typename daosoa>
   void Compute(daosoa* cells) const {
     const size_t n_vectors = cells->vectors();
-//    #pragma omp parallel for
+   #pragma omp parallel for
     for (size_t i = 0; i < n_vectors; i++) {
       auto& cell = (*cells)[i];
       // Basically, the idea is to make the sum of all the forces acting

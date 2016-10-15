@@ -89,7 +89,7 @@ class NeighborOp {
 
     // calc neighbors
     //std::cout << "number of elements " << cells->elements() << std::endl;
-//#pragma omp parallel for
+#pragma omp parallel for
     for (size_t i = 0; i < cells->elements(); i++) {
       const auto vector_idx = i / VcBackend::kVecLen;
       const auto scalar_idx = i % VcBackend::kVecLen;
@@ -128,7 +128,7 @@ class NeighborOp {
     }
 
     // update neighbors
-//#pragma omp parallel for
+#pragma omp parallel for
     for (size_t i = 0; i < cells->vectors(); i++) {
       (*cells)[i].SetNeighbors(neighbors[i]);
     }
