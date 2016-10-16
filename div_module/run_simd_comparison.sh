@@ -38,20 +38,20 @@ function noOmp {
 echo "SSE"
 withOmp
 compile "-O3" sse
-sleep 1 && ./$BIN --scaling
+sleep 1 && ./$BIN --detailed-scaling 5
 
 noOmp
 compile "-O3" sse_noomp
-sleep 1 && ./$BIN
+sleep 1 && ./$BIN 5
 
 echo "AVX"
 withOmp
 compile "-O3 -mavx2" avx
-sleep 1 && ./$BIN --scaling
+sleep 1 && ./$BIN --detailed-scaling 5
 
 noOmp
 compile "-O3 -mavx2" avx_noomp
-sleep 1 && ./$BIN
+sleep 1 && ./$BIN 5
 
 # revert to initial status
 withOmp
