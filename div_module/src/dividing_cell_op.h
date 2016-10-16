@@ -20,7 +20,7 @@ class DividingCellOp {
 #pragma omp parallel for
     for (size_t i = 0; i < n_vectors; i++) {
       // if diameter <= 20 then changeVolume(300) else do nothing
-      auto ifresult = (*cells)[i].GetDiameter() <= 20;
+      auto ifresult = (*cells)[i].GetDiameter() <= 40;
       VcBackend::real_v dv(300);
       dv.setZeroInverted(ifresult);
       (*cells)[i].ChangeVolume(dv);
