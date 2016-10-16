@@ -1,13 +1,57 @@
 #!/bin/bash
+# script compiles different binaries (sse, avx with or without omp pragmas)
+# and executes benchmarks
+# script must be called from build directory
+
+BIN=divModule
+
+# param1: optimization and simd flag (e.g. -O3 -mavx2)
+# param2: binary name suffix
+function compile {
+  make clean >/dev/null ; rm CMakeCache.txt >/dev/null ; \
+   cmake -Dtest=off -DCMAKE_CXX_FLAGS="$1" -DCMAKE_BUILD_TYPE=Debug .. >/tmp/${BIN}_log 2>&1  && \
+   make -j5 >/tmp/${BIN}_log
+
+  cp $BIN ${BIN}_$2
+}
+
+function commentOmpPragmas {
+  sed -i.bak "s|#pragma omp|//#pragma omp|g" $1
+  rm $1.bak
+}
+
+function uncommentOmpPragmas {
+  sed -i.bak "s|//#pragma omp|#pragma omp|g" $1
+  rm $1.bak
+}
+
+function withOmp {
+  uncommentOmpPragmas ../src/dividing_cell_op.h
+  uncommentOmpPragmas ../src/displacement_op.h
+}
+
+function noOmp {
+  commentOmpPragmas ../src/dividing_cell_op.h
+  commentOmpPragmas ../src/displacement_op.h
+}
 
 echo "SSE"
-make clean >/dev/null ; rm CMakeCache.txt >/dev/null ; \
- cmake -Dtest=off -DCMAKE_CXX_FLAGS="-O3" -DCMAKE_BUILD_TYPE=Debug .. >/dev/null 2>&1 && \
- make -j5 >/dev/null && \
- sleep 1 && ./divModule --full-analysis
+withOmp
+compile "-O3" sse
+sleep 1 && ./$BIN --scaling
+
+noOmp
+compile "-O3" sse_noomp
+sleep 1 && ./$BIN
 
 echo "AVX"
-make clean >/dev/null ; rm CMakeCache.txt >/dev/null ; \
- cmake -Dtest=off -DCMAKE_CXX_FLAGS="-O3 -mavx2" -DCMAKE_BUILD_TYPE=Debug .. >/dev/null 2>&1 && \
- make -j5 >/dev/null && \
- sleep 1 && ./divModule --full-analysis
+withOmp
+compile "-O3 -mavx2" avx
+sleep 1 && ./$BIN --scaling
+
+noOmp
+compile "-O3 -mavx2" avx_noomp
+sleep 1 && ./$BIN
+
+# revert to initial status
+withOmp
