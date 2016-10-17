@@ -150,6 +150,6 @@ if (test)
 endif()
 
 # --------------------- build division module simulation executable ---------------------
-set(SIMULATION_TARGET divModule)
+set(SIMULATION_TARGET bdmp)
 add_executable(${SIMULATION_TARGET} ${CMAKE_SOURCE_DIR}/src/main.cc)
 target_link_libraries(${SIMULATION_TARGET} biodynamo)

@@ -3,7 +3,7 @@
 # and executes benchmarks
 # script must be called from build directory
 
-BIN=divModule
+BIN=bdmp
 
 # param1: optimization and simd flag (e.g. -O3 -mavx2)
 # param2: binary name suffix
