@@ -11,7 +11,7 @@ option(coverage "Enable test coverage report generation." OFF)
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 find_package(Vc REQUIRED)
 find_package(OpenMP REQUIRED)
-find_package(VTune REQUIRED)
+# find_package(VTune REQUIRED)
 if (test)
   # must be before include(${ROOT_USE_FILE}) otherwise test compile fails
   find_package(Threads REQUIRED)
@@ -73,7 +73,7 @@ endif()
 include_directories("${CMAKE_SOURCE_DIR}/src")
 include_directories("${CMAKE_SOURCE_DIR}/third_party")
 include_directories(${Vc_INCLUDE_DIR})
-include_directories(${VTUNE_INCLUDE_DIR})
+# include_directories(${VTUNE_INCLUDE_DIR})
 
 #ROOT_GENERATE_DICTIONARY("${CMAKE_BINARY_DIR}/bdmDict"
 #    simulation/ecm.h
@@ -85,7 +85,7 @@ file(GLOB_RECURSE HEADERS "${CMAKE_SOURCE_DIR}/src/*.h")
 add_library(biodynamo SHARED ${SOURCES} ${HEADERS})
 #target_link_libraries(biodynamo ${ROOT_LIBRARIES})
 target_link_libraries(biodynamo ${Vc_LIBRARIES})
-target_link_libraries(biodynamo ${VTUNE_LIBRARIES})
+# target_link_libraries(biodynamo ${VTUNE_LIBRARIES})
 
 # add custom clean target for shared library
 add_custom_target(libbdmclean COMMAND ${CMAKE_COMMAND} -P "${CMAKE_BINARY_DIR}/CMakeFiles/biodynamo.dir/cmake_clean.cmake")
