@@ -147,7 +147,7 @@ if (test)
   add_test(NAME ${TEST_TARGET} COMMAND ${TEST_TARGET})
   # add valgrind test
   if (valgrind)
-    add_test(NAME valgrind COMMAND valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all --error-exitcode=1 ./${TEST_TARGET})
+    add_test(NAME valgrind COMMAND valgrind --tool=memcheck --leak-check=full --show-leak-kinds=all --show-reachable=no --suppressions=${CMAKE_BINARY_DIR}/../valgrind-biod.supp --error-exitcode=1 ./${TEST_TARGET})
   endif()
 
   # create target that shows the test ouput on failure
