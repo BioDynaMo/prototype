@@ -9,7 +9,6 @@ option(coverage "Enable test coverage report generation." OFF)
 
 #--------------------- find packages -------------
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
-find_package(Vc REQUIRED)
 find_package(OpenMP REQUIRED)
 # find_package(VTune REQUIRED)
 if (test)
@@ -66,6 +65,22 @@ if(APPLE)
 else()
   set(CMAKE_INSTALL_RPATH ${CMAKE_INSTALL_FULL_LIBDIR}) # install LIBDIR
 endif()
+
+#--------------------- setup Vc ----------------
+# setup google test
+ExternalProject_Add(
+    Vc
+    URL "${CMAKE_SOURCE_DIR}/third_party/Vc-master_2bfce51.zip"
+    PREFIX "${CMAKE_CURRENT_BINARY_DIR}/Vc"
+    CMAKE_ARGS "-DBUILD_TESTING=off"
+    CMAKE_CACHE_ARGS
+    -DCMAKE_CXX_COMPILER:FILEPATH=${CMAKE_CXX_COMPILER}
+    -DCMAKE_C_COMPILER:FILEPATH=${CMAKE_C_COMPILER}
+    INSTALL_COMMAND "" # Disable install step
+)
+set(Vc_INCLUDE_DIR "${CMAKE_CURRENT_BINARY_DIR}/Vc/src/Vc/include"
+                   "${CMAKE_CURRENT_BINARY_DIR}/Vc/src/Vc/")
+set(Vc_LIBRARIES "${CMAKE_CURRENT_BINARY_DIR}/Vc/src/Vc-build/libVc.a")
 
 #--------------------- build shared library libbiodynamo ----------------
 # add the headers into the project
